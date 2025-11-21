@@ -21,18 +21,24 @@ namespace MissionStuff.ivsdk
         public static Vector3 PlayerPos { get; set; }
 
         // IniShit
-        private static bool tripSkipEnable;
-        private static bool buffAlliesEnable;
-        private static bool noProofsEnable;
-        private static bool moreWantedEnable;
+        public static bool tripSkipEnable;
+        public static bool buffAlliesEnable;
+        public static bool noProofsEnable;
+        public static bool moreWantedEnable;
+        public static bool replaceWeaponEnable;
+        public static bool SCOLoadEnable;
+        public static bool missionLockEnable;
 
         // MissionShit
-        private static bool timedToBlowEnable;
-        private static bool heartTimeEnable;
-        private static bool buoysAhoyEnable;
+        public static bool timedToBlowEnable;
+        public static bool heartTimeEnable;
+        public static bool buoysAhoyEnable;
 
         // SettingsFileShit
         public static SettingsFile mainSettings;
+
+        // OtherShit
+        public static bool dontCrash = false;
         public Main()
         {
             Uninitialize += Main_Uninitialize;
@@ -59,8 +65,10 @@ namespace MissionStuff.ivsdk
             Init(Settings);
             if (tripSkipEnable)
                 TripSkip.Init(Settings);
-            if (buffAlliesEnable)
+            if (buffAlliesEnable || replaceWeaponEnable)
                 ArmoredAllies.Init(Settings);
+            if (replaceWeaponEnable)
+                WeaponReplace.Init(Settings);
             if (noProofsEnable)
                 RemoveProofs.Init(Settings);
             if (moreWantedEnable)
@@ -71,6 +79,10 @@ namespace MissionStuff.ivsdk
                 HaveAHeartTimed.Init(Settings);
             if (buoysAhoyEnable)
                 BuoysAhoy.Init(Settings);
+            if (SCOLoadEnable)
+                SCOLoader.Init(Settings);
+            if (missionLockEnable)
+                ProgressLock.Init(Settings);
         }
         public static bool InitialChecks()
         {
@@ -83,6 +95,9 @@ namespace MissionStuff.ivsdk
             buffAlliesEnable = settings.GetBoolean("MAIN", "BuffAllies", false);
             noProofsEnable = settings.GetBoolean("MAIN", "RemoveEnemyProofs", false);
             moreWantedEnable = settings.GetBoolean("MAIN", "MoreWantedStars", false);
+            replaceWeaponEnable = settings.GetBoolean("MAIN", "ReplaceMissionPedWeapons", false);
+            SCOLoadEnable = settings.GetBoolean("MAIN", "SCOLoader", false);
+            missionLockEnable = settings.GetBoolean("MAIN", "MissionLocks", false);
 
             timedToBlowEnable = settings.GetBoolean("MAIN", "TimedToBlow", false);
             heartTimeEnable = settings.GetBoolean("MAIN", "Pacemaker", false);
@@ -97,18 +112,27 @@ namespace MissionStuff.ivsdk
 
             if (!InitialChecks())
                 return;
+
             if (PlayerPed == null)
                 return;
 
             PedHelper.GrabAllPeds();
+
             if (tripSkipEnable)
                 TripSkip.Tick();
-            if (buffAlliesEnable)
-                ArmoredAllies.Tick();
             if (noProofsEnable)
                 RemoveProofs.Tick();
             if (moreWantedEnable)
                 WantedStars.Tick();
+            if (replaceWeaponEnable)
+                WeaponReplace.Tick();
+            if (missionLockEnable)
+                ProgressLock.Tick();
+            if (SCOLoadEnable)
+                SCOLoader.Tick();
+
+            //SET_CHAR_PROOFS(Main.PlayerHandle, false, false, false, false, false);
+            ArmoredAllies.Tick();
 
             if (timedToBlowEnable)
                 TimedToBlow.Tick();

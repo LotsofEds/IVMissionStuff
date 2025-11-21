@@ -24,6 +24,7 @@ namespace MissionStuff.ivsdk
         private static float costMult;
         private static float pDist;
         private static Vector3 teleportCoords;
+        private static float teleportHdng;
         private static GameKey tripSkipKey;
 
         // OtherShit
@@ -31,6 +32,7 @@ namespace MissionStuff.ivsdk
         private static bool gotList;
         private static bool hasSkipped;
         private static bool activateTripSkip;
+        private static bool endSkipTrip;
         private static bool printHelp;
         private static uint gTimer;
         private static uint fTimer;
@@ -75,6 +77,7 @@ namespace MissionStuff.ivsdk
             missionVeh = settings.GetBoolean(scoName, "TSRequireMissionVeh", false);
             reqVeh = settings.GetBoolean(scoName, "TSRequireVehicle", false);
             teleportCoords = settings.GetVector3(scoName, "TSTeleportCoords", Vector3.Zero);
+            teleportHdng = settings.GetFloat(scoName, "TSTeleportHeading", 0);
             textToCheck = settings.GetValue(scoName, "CheckpointGXT", "");
 
             string pedString = settings.GetValue(scoName, "FriendlyModels", "");
@@ -92,6 +95,7 @@ namespace MissionStuff.ivsdk
             /*if (IS_THIS_PRINT_BEING_DISPLAYED("J1_CS2_END", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
                 IVGame.ShowSubtitleMessage("ass");*/
             SkipTheTrip();
+            EndTrip();
 
             if (!IS_SCREEN_FADED_OUT())
             {
@@ -102,7 +106,10 @@ namespace MissionStuff.ivsdk
                         PedHelper.GrabAllPeds();
                         LoadCheckpointData(Main.mainSettings, sco);
 
-                        GET_CAR_CHAR_IS_USING(Main.PlayerHandle, out pVehicle);
+                        if (IS_CHAR_IN_ANY_CAR(Main.PlayerHandle))
+                            GET_CAR_CHAR_IS_USING(Main.PlayerHandle, out pVehicle);
+                        else
+                            pVehicle = -1;
                         //bool saveCheckpoint = true;
                         bool canTripSkip = true;
 
@@ -126,6 +133,9 @@ namespace MissionStuff.ivsdk
                         }
                         foreach (var ped in PedList)
                         {
+                            if (!DOES_CHAR_EXIST(ped))
+                                continue;
+
                             if (missionName == sco)
                             {
                                 if (missionVeh && (!IS_CHAR_SITTING_IN_CAR(ped, pVehicle) || !IS_CAR_A_MISSION_CAR(pVehicle)))
@@ -182,6 +192,7 @@ namespace MissionStuff.ivsdk
                                     {
                                         if (chargeMoney)
                                             ADD_SCORE(Main.PlayerIndex, -((int)(pDist * costMult)));
+                                        GET_GAME_TIMER(out fTimer);
                                         hasSkipped = true;
                                         activateTripSkip = true;
                                         DO_SCREEN_FADE_OUT(1000);
@@ -213,15 +224,37 @@ namespace MissionStuff.ivsdk
             if (!activateTripSkip)
                 return;
 
+            if (endSkipTrip)
+                return;
+
             if (!IS_SCREEN_FADED_OUT())
                 return;
 
             if (reqVeh || missionVeh)
+            {
                 SET_CAR_COORDINATES(pVehicle, teleportCoords);
+                SET_CAR_HEADING(pVehicle, teleportHdng);
+            }
             else
+            {
                 SET_CHAR_COORDINATES(Main.PlayerHandle, teleportCoords);
+                SET_CHAR_HEADING(pVehicle, teleportHdng);
+            }
+            GET_GAME_TIMER(out gTimer);
+
+            if (gTimer >= fTimer + 2500)
+                endSkipTrip = true;
+        }
+        private static void EndTrip()
+        {
+            if (!endSkipTrip)
+                return;
+
+            if (reqVeh || missionVeh)
+                SET_CAR_ON_GROUND_PROPERLY(pVehicle);
 
             DO_SCREEN_FADE_IN(1000);
+            endSkipTrip = false;
             activateTripSkip = false;
         }
     }

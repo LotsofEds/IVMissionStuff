@@ -129,7 +129,7 @@ namespace MissionStuff.ivsdk
                     //SET_PLAYER_INVISIBLE_TO_AI
                 }
             }
-            else
+            else if (startTime)
             {
                 MARK_CHAR_AS_NO_LONGER_NEEDED(pPed1);
                 MARK_CHAR_AS_NO_LONGER_NEEDED(pPed2);

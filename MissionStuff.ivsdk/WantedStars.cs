@@ -62,7 +62,10 @@ namespace MissionStuff.ivsdk
                     }
                 }
                 else if (missionName == MissionSCO)
+                {
                     SET_MAX_WANTED_LEVEL(6);
+                    missionName = "";
+                }
             }
         }
     }

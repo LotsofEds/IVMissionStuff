@@ -54,6 +54,7 @@
     <Compile Include="BuoysAhoy.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="HaveAHeartTimed.cs" />
+    <Compile Include="ProgressLock.cs" />
     <Compile Include="SCOLoader.cs" />
     <Compile Include="TimedToBlow.cs" />
     <Compile Include="PedHelper.cs" />

@@ -62,6 +62,7 @@ namespace MissionStuff.ivsdk
         private static uint fTimer;
         public static void UnInit()
         {
+            SET_MAX_WANTED_LEVEL(6);
             for (int i = 0; i < 16; i++)
             {
                 DELETE_CAR(ref enemyVehicles[i]);
@@ -72,7 +73,6 @@ namespace MissionStuff.ivsdk
             {
                 DELETE_CHAR(ref landEnemyPeds[i]);
             }
-            DONT_DISPATCH_COPS_FOR_PLAYER(Main.PlayerIndex, false);
             MARK_MODEL_AS_NO_LONGER_NEEDED(GET_HASH_KEY("squalo"));
             MARK_MODEL_AS_NO_LONGER_NEEDED(GET_HASH_KEY("jetmax"));
             MARK_MODEL_AS_NO_LONGER_NEEDED(GET_HASH_KEY("bm_drum_fla2"));
@@ -81,12 +81,12 @@ namespace MissionStuff.ivsdk
             MARK_OBJECT_AS_NO_LONGER_NEEDED(barrelOne);
             MARK_OBJECT_AS_NO_LONGER_NEEDED(barrelTwo);
 
-            if (pWeapSlot > 0)
-            IVWeaponInfo.GetWeaponInfo((uint)plyrWeapon).WeaponSlot = pWeapSlot;
+            if (pWeapSlot != 2 && pWeapSlot != 4 && pWeapSlot != 5 && pWeapSlot > 0)
+                IVWeaponInfo.GetWeaponInfo((uint)plyrWeapon).WeaponSlot = pWeapSlot;
 
             SET_CHAR_CAN_BE_SHOT_IN_VEHICLE(Main.PlayerHandle, true);
 
-            if (pWeap > 0)
+            if (!HAS_CHAR_GOT_WEAPON(Main.PlayerHandle, pWeap) && pWeap > 0)
                 GIVE_WEAPON_TO_CHAR(Main.PlayerHandle, pWeap, pAmmo1, false);
             taskStatus = 0;
             bernieCheckPoint = -1;
@@ -124,7 +124,7 @@ namespace MissionStuff.ivsdk
                 CREATE_CAM(14, out cam);
                 ATTACH_CAM_TO_VEHICLE(cam, pVeh);
                 SET_CAM_ATTACH_OFFSET_IS_RELATIVE(cam, true);
-                SET_CAM_ATTACH_OFFSET(cam, 0, -4.0f, 1.0f);
+                SET_CAM_ATTACH_OFFSET(cam, 0, -4.5f, 1.25f);
                 SET_CAM_FOV(cam, 60);
                 POINT_CAM_AT_VEHICLE(cam, pVeh);
                 SET_CAM_ACTIVE(cam, true);
@@ -132,19 +132,14 @@ namespace MissionStuff.ivsdk
                 ACTIVATE_SCRIPTED_CAMS(true, true);
 
                 CREATE_CAM(14, out cam2);
-                ATTACH_CAM_TO_VEHICLE(cam2, pVeh);
-                SET_CAM_ATTACH_OFFSET_IS_RELATIVE(cam2, true);
-                SET_CAM_ATTACH_OFFSET(cam2, 0, -4.0f, 1.0f);
-                SET_CAM_FOV(cam2, 45);
-                POINT_CAM_AT_COORD(cam2, 854.2511f, 931.4077f, 6.9515f);
                 //SET_CAM_PROPAGATE(cam2, true);
+                CREATE_CAM(3, out interpCam);
 
                 GET_GAME_TIMER(out fTimer);
             }
             else
             {
                 SET_CHAR_WILL_DO_DRIVEBYS(Main.PlayerHandle, true);
-                GET_GAME_TIMER(out gTimer);
                 if (!IS_CHAR_INJURED(shooterPeds[13]))
                 _TASK_DRIVE_BY(Main.PlayerHandle, shooterPeds[13], 1, 0, 0, 0, 540, 8, true, 45000);
                 //_TASK_COMBAT(Main.PlayerHandle, shooterPeds[13]);
@@ -170,35 +165,58 @@ namespace MissionStuff.ivsdk
                     {
                         DELETE_CHAR(ref landEnemyPeds[i]);
                     }
-                    SET_CAM_ACTIVE(cam2, true);
-                    SET_CAM_PROPAGATE(cam2, true);
-                    ACTIVATE_SCRIPTED_CAMS(true, true);
-                    CREATE_CAM(3, out interpCam);
+                    ATTACH_CAM_TO_VEHICLE(cam2, pVeh);
+                    SET_CAM_ATTACH_OFFSET_IS_RELATIVE(cam2, true);
+                    SET_CAM_ATTACH_OFFSET(cam2, 0, -4.0f, 1.25f);
+                    SET_CAM_FOV(cam2, 30);
+                    POINT_CAM_AT_COORD(cam2, 854.2511f, 931.4077f, 6.9515f);
+
                     SET_CAM_ACTIVE(interpCam, true);
                     SET_CAM_PROPAGATE(interpCam, true);
+                    ACTIVATE_SCRIPTED_CAMS(true, true);
                     SET_CAM_INTERP_STYLE_CORE(interpCam, cam, cam2, 3000, false);
                     endCutscene = true;
                 }
-                else if (endCutscene && gTimer >= fTimer + 8000)
+                else if (endCutscene && gTimer >= fTimer + 7000)
                 {
-                    DESTROY_ALL_CAMS();
-                    ACTIVATE_SCRIPTED_CAMS(false, false);
-                    SET_GAME_CAM_PITCH(0.0f);
-                    SET_GAME_CAM_HEADING(0.0f);
-                    SET_CAM_BEHIND_PED(Main.PlayerHandle);
-                    //if (IVMenuManager.HudOn)
-                    DISPLAY_HUD(true);
-                    DISPLAY_RADAR(true);
-                    SET_PLAYER_CONTROL(Main.PlayerIndex, true);
+                    SET_CAM_ACTIVE(cam, false);
+                    SET_CAM_ACTIVE(interpCam, false);
+                    SET_CAM_ACTIVE(cam2, true);
+                    SET_CAM_PROPAGATE(cam2, true);
+                    ACTIVATE_SCRIPTED_CAMS(true, true);
+                    if (gTimer >= fTimer + 8000)
+                    {
+                        SET_INTERP_FROM_SCRIPT_TO_GAME(true, 2000);
+                        //DESTROY_ALL_CAMS();
+                        ACTIVATE_SCRIPTED_CAMS(false, false);
+                        SET_GAME_CAM_PITCH(0.0f);
+                        SET_GAME_CAM_HEADING(0.0f);
+                        SET_CAM_BEHIND_PED(Main.PlayerHandle);
+                        //if (IVMenuManager.HudOn)
+                        DISPLAY_HUD(true);
+                        DISPLAY_RADAR(true);
+                        SET_PLAYER_CONTROL(Main.PlayerIndex, true);
 
-                    triggerCutscene = false;
+                        triggerCutscene = false;
+                    }
                 }
             }
         }
         public static void ProcessChase()
         {
+            SET_MAX_WANTED_LEVEL(0);
             GET_SCRIPT_TASK_STATUS(berniePed, 15, out taskStatus);
             //IVGame.ShowSubtitleMessage(bernieCheckPoint.ToString());
+
+            if (GET_ENGINE_HEALTH(pVeh) < 200 || GET_PETROL_TANK_HEALTH(pVeh) < 200)
+            {
+                IVText.TheIVText.ReplaceTextOfTextLabel("PLACEHOLDERSL", warnMessage);
+                PRINT_HELP("PLACEHOLDERSL");
+            }
+            if (IS_THIS_PRINT_BEING_DISPLAYED("BER3_GOD2", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+                IVGame.ShowSubtitleMessage(newMessage, 5000);
+            if (IS_THIS_PRINT_BEING_DISPLAYED("BER3_GOD3b", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+                IVGame.ShowSubtitleMessage("~s~Follow ~r~Dimitri's men~s~ and get rid of them.", 5000);
 
             for (int i = 0; i < 16; i++)
             {
@@ -240,14 +258,14 @@ namespace MissionStuff.ivsdk
                     {
                         if (pedCheckpoint == 0)
                         {
-                            _TASK_CAR_DRIVE_TO_COORD(driverPeds[i], enemyVehicles[i], 418.805f, -195.915f, 0, 15.0f, 1, 0, 0, 5.0f, 45000);
+                            _TASK_CAR_DRIVE_TO_COORD(driverPeds[i], enemyVehicles[i], 418.805f, -195.915f, 0, 20.0f, 1, 0, 0, 5.0f, 45000);
                             pedCheckpoint++;
                         }
                     }
                     if (i == 6)
                     {
                         if (pedCheckpoint == 1)
-                            _TASK_CAR_DRIVE_TO_COORD(driverPeds[i], enemyVehicles[i], 412.305f, -194.415f, 0, 15.0f, 1, 0, 0, 5.0f, 45000);
+                            _TASK_CAR_DRIVE_TO_COORD(driverPeds[i], enemyVehicles[i], 410.305f, -194.415f, 0, 18.0f, 1, 0, 0, 5.0f, 45000);
 
                         else if (pedCheckpoint == 2)
                             EXPLODE_CAR(enemyVehicles[i], true, false);
@@ -347,13 +365,13 @@ namespace MissionStuff.ivsdk
                         CREATE_CHAR_INSIDE_CAR(enemyVehicles[3], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[3]);
                         CREATE_CHAR_AS_PASSENGER(enemyVehicles[3], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[3]);
 
-                        _TASK_CAR_DRIVE_TO_COORD(driverPeds[3], enemyVehicles[3], 580.851f, -508.069f, 0.0f, 20.0f, 1, 0, 0, 20.0f, 45000);
+                        _TASK_CAR_DRIVE_TO_COORD(driverPeds[3], enemyVehicles[3], 580.851f, -508.069f, 0.0f, 18.0f, 1, 0, 0, 20.0f, 45000);
                         GIVE_WEAPON_TO_CHAR(shooterPeds[3], enemyWeaponA, 9999, true);
 
                         CREATE_CHAR_INSIDE_CAR(enemyVehicles[4], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[4]);
                         CREATE_CHAR_AS_PASSENGER(enemyVehicles[4], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[4]);
 
-                        _TASK_CAR_DRIVE_TO_COORD(driverPeds[4], enemyVehicles[4], 580.851f, -508.069f, 0.0f, 15.0f, 1, 0, 0, 17.0f, 45000);
+                        _TASK_CAR_DRIVE_TO_COORD(driverPeds[4], enemyVehicles[4], 580.851f, -508.069f, 0.0f, 14.0f, 1, 0, 0, 17.0f, 45000);
                         GIVE_WEAPON_TO_CHAR(shooterPeds[4], enemyWeaponB, 9999, true);
 
                         // 411.376, -434.724, 270
@@ -409,7 +427,7 @@ namespace MissionStuff.ivsdk
                     }
                     else if (bernieCheckPoint == 6)
                     {
-                        _TASK_CAR_DRIVE_TO_COORD(berniePed, pVeh, 415.305f, -196.915f, 0.0f, 25.0f, 1, 0, 0, 20.0f, 45000);
+                        _TASK_CAR_DRIVE_TO_COORD(berniePed, pVeh, 414.805f, -196.915f, 0.0f, 25.0f, 1, 0, 0, 10.0f, 45000);
 
                         CREATE_CHAR_INSIDE_CAR(enemyVehicles[7], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[7]);
                         CREATE_CHAR_AS_PASSENGER(enemyVehicles[7], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[7]);
@@ -437,7 +455,7 @@ namespace MissionStuff.ivsdk
                     }
                     else if (bernieCheckPoint == 8)
                     {
-                        _TASK_CAR_DRIVE_TO_COORD(berniePed, pVeh, 304.614f, 179.926f, 0.0f, 25.0f, 1, 0, 0, 20.0f, 45000);
+                        _TASK_CAR_DRIVE_TO_COORD(berniePed, pVeh, 304.614f, 179.926f, 0.0f, 25.0f, 0, 0, 3, 20.0f, 45000);
 
                         MARK_CHAR_AS_NO_LONGER_NEEDED(driverPeds[5]);
                         MARK_CHAR_AS_NO_LONGER_NEEDED(shooterPeds[5]);
@@ -461,7 +479,7 @@ namespace MissionStuff.ivsdk
                         CREATE_CHAR_INSIDE_CAR(enemyVehicles[9], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[9]);
                         CREATE_CHAR_AS_PASSENGER(enemyVehicles[9], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[9]);
 
-                        _TASK_CAR_DRIVE_TO_COORD(driverPeds[9], enemyVehicles[9], 264.477f, 490.362f, 0.0f, 15.0f, 1, 0, 0, 20.0f, 45000);
+                        _TASK_CAR_DRIVE_TO_COORD(driverPeds[9], enemyVehicles[9], 259.477f, 490.362f, 0.0f, 15.0f, 1, 0, 0, 20.0f, 45000);
                         GIVE_WEAPON_TO_CHAR(shooterPeds[9], enemyWeaponA, 9999, true);
 
                         // 296.643, 544.845, 30
@@ -567,6 +585,8 @@ namespace MissionStuff.ivsdk
                         //GIVE_WEAPON_TO_CHAR(landEnemyPeds[7], enemyWeaponA, 9999, true);
                         //GIVE_WEAPON_TO_CHAR(landEnemyPeds[8], enemyWeaponB, 9999, true);
 
+                        CREATE_OBJECT(GET_HASH_KEY("bm_drum_fla2"), 396.037f, 1072.724f, 2.02f, out barrelOne, true);
+
                         for (int i = 5; i < 7; i++)
                         {
                             SET_CHAR_HEALTH(landEnemyPeds[i], enemyHealth);
@@ -584,8 +604,9 @@ namespace MissionStuff.ivsdk
                     else if (bernieCheckPoint == 14)
                     {
                         _TASK_CAR_DRIVE_TO_COORD(berniePed, pVeh, 375.939f, 1116.398f, 0.0f, 25.0f, 1, 0, 0, 20.0f, 45000);
+                        APPLY_FORCE_TO_OBJECT(barrelOne, 3, 0, 0, 0.1f, 0, 0, 0, 0, 1, 1, 1);
 
-                        CREATE_OBJECT(GET_HASH_KEY("bm_drum_fla2"), 396.037f, 1072.724f, 2.12f, out barrelOne, true);
+                        CREATE_OBJECT(GET_HASH_KEY("bm_drum_fla2"), 412.971f, 1120.498f, 2.02f, out barrelTwo, true);
 
                         MARK_CHAR_AS_NO_LONGER_NEEDED(driverPeds[9]);
                         MARK_CHAR_AS_NO_LONGER_NEEDED(shooterPeds[9]);
@@ -596,7 +617,13 @@ namespace MissionStuff.ivsdk
                     {
                         _TASK_CAR_DRIVE_TO_COORD(berniePed, pVeh, 472.502f, 1136.906f, 0.0f, 25.0f, 1, 0, 0, 20.0f, 45000);
 
-                        CREATE_OBJECT(GET_HASH_KEY("bm_drum_fla2"), 412.971f, 1120.498f, 2.12f, out barrelTwo, true);
+                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[14], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[14]);
+                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[14], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[14]);
+
+                        _TASK_CAR_DRIVE_TO_COORD(driverPeds[14], enemyVehicles[14], 679.895f, 1145.142f, 0.0f, 12.0f, 1, 0, 0, 20.0f, 45000);
+                        GIVE_WEAPON_TO_CHAR(shooterPeds[14], enemyWeaponB, 9999, true);
+
+                        APPLY_FORCE_TO_OBJECT(barrelOne, 3, 0, 0, 0.1f, 0, 0, 0, 0, 1, 1, 1);
 
                         MARK_CHAR_AS_NO_LONGER_NEEDED(driverPeds[10]);
                         MARK_CHAR_AS_NO_LONGER_NEEDED(shooterPeds[10]);
@@ -608,12 +635,6 @@ namespace MissionStuff.ivsdk
                     else if (bernieCheckPoint == 16)
                     {
                         _TASK_CAR_DRIVE_TO_COORD(berniePed, pVeh, 609.895f, 1130.142f, 0.0f, 20.0f, 1, 0, 0, 20.0f, 45000);
-
-                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[14], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[14]);
-                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[14], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[14]);
-
-                        _TASK_CAR_DRIVE_TO_COORD(driverPeds[14], enemyVehicles[14], 679.895f, 1145.142f, 0.0f, 20.0f, 1, 0, 0, 20.0f, 45000);
-                        GIVE_WEAPON_TO_CHAR(shooterPeds[14], enemyWeaponB, 9999, true);
 
                         MARK_OBJECT_AS_NO_LONGER_NEEDED(barrelTwo);
 
@@ -639,7 +660,10 @@ namespace MissionStuff.ivsdk
                     }
                 }
                 else if (bernieCheckPoint == 19)
+                {
+                    startChase = false;
                     SET_PLAYER_CONTROL(Main.PlayerIndex, true);
+                }
                 bernieCheckPoint++;
             }
 
@@ -651,26 +675,16 @@ namespace MissionStuff.ivsdk
         {
             if (NativeGame.IsScriptRunning("bernie3"))
             {
+                GET_GAME_TIMER(out gTimer);
                 if (startChase)
                     ProcessChase();
                 if (triggerCutscene)
                     ChaseEndCutscene();
+                else if (endCutscene && gTimer >= fTimer + 12000)
+                    DESTROY_ALL_CAMS();
 
                 else if (IS_THIS_PRINT_BEING_DISPLAYED("BC3_ARRIVE_01", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) || IS_THIS_PRINT_BEING_DISPLAYED("BC3_ARRIVE_02", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) || IS_THIS_PRINT_BEING_DISPLAYED("BC3_ARRIVE_03", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
                 {
-                    if (IS_CHAR_SITTING_IN_ANY_CAR(Main.PlayerHandle))
-                        GET_CAR_CHAR_IS_USING(Main.PlayerHandle, out pVeh);
-                    switchSeats = true;
-                }
-                else if (IS_PLAYER_CONTROL_ON(Main.PlayerIndex) && switchSeats)
-                {
-                    WARP_CHAR_INTO_CAR_AS_PASSENGER(Main.PlayerHandle, pVeh, (int)VehicleSeat.RightRear);
-
-                    pWeapSlot = IVWeaponInfo.GetWeaponInfo((uint)plyrWeapon).WeaponSlot;
-                    GET_CHAR_WEAPON_IN_SLOT(Main.PlayerHandle, 5, out pWeap, out pAmmo1, out pAmmo2);
-                    if (IVWeaponInfo.GetWeaponInfo((uint)plyrWeapon).WeaponSlot != 2 && IVWeaponInfo.GetWeaponInfo((uint)plyrWeapon).WeaponSlot != 4 && IVWeaponInfo.GetWeaponInfo((uint)plyrWeapon).WeaponSlot != 5)
-                        IVWeaponInfo.GetWeaponInfo((uint)plyrWeapon).WeaponSlot = 5;
-
                     if (!HAS_MODEL_LOADED(GET_HASH_KEY("squalo")))
                         REQUEST_MODEL(GET_HASH_KEY("squalo"));
 
@@ -682,6 +696,24 @@ namespace MissionStuff.ivsdk
 
                     if (!HAS_MODEL_LOADED(GET_HASH_KEY("m_y_grus_lo_01")))
                         REQUEST_MODEL(GET_HASH_KEY("m_y_grus_lo_01"));
+
+                    if (IS_CHAR_SITTING_IN_ANY_CAR(Main.PlayerHandle))
+                        GET_CAR_CHAR_IS_USING(Main.PlayerHandle, out pVeh);
+
+                    if (IVWeaponInfo.GetWeaponInfo((uint)plyrWeapon).WeaponSlot != 2 && IVWeaponInfo.GetWeaponInfo((uint)plyrWeapon).WeaponSlot != 4 && IVWeaponInfo.GetWeaponInfo((uint)plyrWeapon).WeaponSlot != 5 && IVWeaponInfo.GetWeaponInfo((uint)plyrWeapon).WeaponSlot > 0)
+                    {
+                        pWeapSlot = IVWeaponInfo.GetWeaponInfo((uint)plyrWeapon).WeaponSlot;
+                        GET_CHAR_WEAPON_IN_SLOT(Main.PlayerHandle, 5, out pWeap, out pAmmo1, out pAmmo2);
+                        GET_AMMO_IN_CHAR_WEAPON(Main.PlayerHandle, pWeap, out pAmmo1);
+                        REMOVE_WEAPON_FROM_CHAR(Main.PlayerHandle, pWeap);
+                        IVWeaponInfo.GetWeaponInfo((uint)plyrWeapon).WeaponSlot = 5;
+                    }
+
+                    switchSeats = true;
+                }
+                else if (IS_PLAYER_CONTROL_ON(Main.PlayerIndex) && switchSeats)
+                {
+                    WARP_CHAR_INTO_CAR_AS_PASSENGER(Main.PlayerHandle, pVeh, (int)VehicleSeat.RightRear);
 
                     foreach (var ped in PedHelper.PedHandles)
                     {
@@ -699,9 +731,6 @@ namespace MissionStuff.ivsdk
                             _TASK_CAR_DRIVE_TO_COORD(pedHandle, pVeh, 1043.469f, -886.864f, 3.5f, 20.0f, 1, 0, 0, 20.0f, 45000);
                             LOCK_CAR_DOORS(pVeh, 4);
 
-                            if (IVWeaponInfo.GetWeaponInfo((uint)plyrWeapon).WeaponSlot != 2 && IVWeaponInfo.GetWeaponInfo((uint)plyrWeapon).WeaponSlot != 4 && IVWeaponInfo.GetWeaponInfo((uint)plyrWeapon).WeaponSlot != 5)
-                                REMOVE_WEAPON_FROM_CHAR(Main.PlayerHandle, pWeap);
-
                             GIVE_WEAPON_TO_CHAR(Main.PlayerHandle, plyrWeapon, (int)IVWeaponInfo.GetWeaponInfo((uint)plyrWeapon).MaxAmmo, true);
                             SET_CURRENT_CHAR_WEAPON(Main.PlayerHandle, plyrWeapon, true);
 
@@ -713,9 +742,14 @@ namespace MissionStuff.ivsdk
                             //CREATE_CAR(GET_HASH_KEY("squalo"), 1208.035f, -938.572f, 0, out enemyVehicles[1], true);
 
                             bernieCheckPoint = -1;
-                            DONT_DISPATCH_COPS_FOR_PLAYER(Main.PlayerIndex, true);
+                            SET_MAX_WANTED_LEVEL(0);
 
                             startChase = true;
+                        }
+                        else
+                        {
+                            if (IS_CHAR_IN_ANY_BOAT(pedHandle) && !IS_CHAR_ARMED(pedHandle, 4))
+                                SET_CHAR_CAN_BE_SHOT_IN_VEHICLE(pedHandle, false);
                         }
                     }
                     switchSeats = false;
@@ -723,6 +757,7 @@ namespace MissionStuff.ivsdk
             }
             else if (startChase)
             {
+                SET_MAX_WANTED_LEVEL(6);
                 for (int i = 0; i < 16; i++)
                 {
                     DELETE_CAR(ref enemyVehicles[i]);
@@ -733,7 +768,7 @@ namespace MissionStuff.ivsdk
                 {
                     DELETE_CHAR(ref landEnemyPeds[i]);
                 }
-                DONT_DISPATCH_COPS_FOR_PLAYER(Main.PlayerIndex, false);
+
                 MARK_MODEL_AS_NO_LONGER_NEEDED(GET_HASH_KEY("squalo"));
                 MARK_MODEL_AS_NO_LONGER_NEEDED(GET_HASH_KEY("jetmax"));
                 MARK_MODEL_AS_NO_LONGER_NEEDED(GET_HASH_KEY("bm_drum_fla2"));
@@ -742,11 +777,13 @@ namespace MissionStuff.ivsdk
                 MARK_OBJECT_AS_NO_LONGER_NEEDED(barrelOne);
                 MARK_OBJECT_AS_NO_LONGER_NEEDED(barrelTwo);
 
-                IVWeaponInfo.GetWeaponInfo((uint)plyrWeapon).WeaponSlot = pWeapSlot;
+                if (pWeapSlot != 2 && pWeapSlot != 4 && pWeapSlot != 5 && pWeapSlot > 0)
+                    IVWeaponInfo.GetWeaponInfo((uint)plyrWeapon).WeaponSlot = pWeapSlot;
 
                 SET_CHAR_CAN_BE_SHOT_IN_VEHICLE(Main.PlayerHandle, true);
 
-                GIVE_WEAPON_TO_CHAR(Main.PlayerHandle, pWeap, pAmmo1, false);
+                if (!HAS_CHAR_GOT_WEAPON(Main.PlayerHandle, pWeap) && pWeap > 0)
+                    GIVE_WEAPON_TO_CHAR(Main.PlayerHandle, pWeap, pAmmo1, false);
                 taskStatus = 0;
                 bernieCheckPoint = -1;
                 switchSeats = false;
