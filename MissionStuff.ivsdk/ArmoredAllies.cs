@@ -23,10 +23,11 @@ namespace MissionStuff.ivsdk
 
         // OtherShit
         private static string missionName;
+        private static bool giveArmor;
 
         public static void Init(SettingsFile settings)
         {
-            string SCOString = settings.GetValue("MAIN", "BuffedSCOList", "");
+            string SCOString = settings.GetValue("MAIN", "BuffAlliesSCOList", "");
 
             SCOList.Clear();
             foreach (string SCOName in SCOString.Split(','))
@@ -42,113 +43,96 @@ namespace MissionStuff.ivsdk
             foreach (var pedModel in pedString.Split(','))
                 ModelList.Add(pedModel);
 
-            if (Main.buffAlliesEnable)
-            {
-                string HealthString = settings.GetValue(scoName, "AllyHealthIncrease", "");
+            string HealthString = settings.GetValue(scoName, "AllyHealthIncrease", "");
 
-                HealthList.Clear();
-                foreach (var HealthValue in HealthString.Split(','))
-                {
-                    int HealthAmount = Int32.Parse(HealthValue.Trim());
-                    HealthList.Add(HealthAmount);
-                }
-            }
-            
-            if (Main.replaceWeaponEnable)
+            HealthList.Clear();
+            foreach (var HealthValue in HealthString.Split(','))
             {
-                string WeapString = settings.GetValue(scoName, "AllyWeaponReplacement", "");
-
-                WeaponList.Clear();
-                foreach (var WeaponValue in WeapString.Split(','))
-                {
-                    int WeaponID = Int32.Parse(WeaponValue.Trim());
-                    WeaponList.Add(WeaponID);
-                }
+                int HealthAmount = Int32.Parse(HealthValue.Trim());
             }
+
+            string WeapString = settings.GetValue(scoName, "AllyWeaponReplacement", "");
+
+            WeaponList.Clear();
+            foreach (var WeaponValue in WeapString.Split(','))
+            {
+                int WeaponID = Int32.Parse(WeaponValue.Trim());
+                WeaponList.Add(WeaponID);
+            }
+
+            giveArmor = settings.GetBoolean(scoName, "EnemiesHaveArmor", false);
         }
         public static void Tick()
         {
-            if (Main.buffAlliesEnable || Main.replaceWeaponEnable)
+            foreach (string MissionSCO in SCOList)
             {
-                foreach (string MissionSCO in SCOList)
+                if (NativeGame.IsScriptRunning(MissionSCO))
                 {
-                    if (NativeGame.IsScriptRunning(MissionSCO))
+                    if (missionName != MissionSCO)
                     {
-                        if (missionName != MissionSCO)
+                        missionName = MissionSCO;
+                        LoadHealthData(Main.mainSettings, MissionSCO);
+                    }
+                    foreach (var ped in PedHelper.PedHandles)
+                    {
+                        int pedHandle = ped.Value;
+                        if (!IS_PED_A_MISSION_PED(pedHandle))
+                            continue;
+                        if (pedHandle == Main.PlayerHandle)
+                            continue;
+                        if (HAS_CHAR_BEEN_DAMAGED_BY_WEAPON(pedHandle, 57))
+                            continue;
+                        if (PedList.Contains(pedHandle))
+                            continue;
+
+                        foreach (string pedModel in ModelList)
                         {
-                            missionName = MissionSCO;
-                            LoadHealthData(Main.mainSettings, MissionSCO);
+                            GET_CHAR_MODEL(pedHandle, out int pModel);
+
+                            if (pModel == GET_HASH_KEY(pedModel))
+                                PedList.Add(pedHandle);
                         }
-                        foreach (var ped in PedHelper.PedHandles)
+                    }
+
+                    foreach (var ped in PedList)
+                    {
+                        if (!DOES_CHAR_EXIST(ped))
+                            continue;
+
+                        GET_CURRENT_CHAR_WEAPON(ped, out int pedWeap);
+                        GET_CHAR_MODEL(ped, out int pModel);
+
+                        foreach (string pedModel in ModelList)
                         {
-                            int pedHandle = ped.Value;
-                            if (!IS_PED_A_MISSION_PED(pedHandle))
-                                continue;
-                            if (pedHandle == Main.PlayerHandle)
-                                continue;
-                            if (HAS_CHAR_BEEN_DAMAGED_BY_WEAPON(pedHandle, 57))
-                                continue;
-                            if (PedList.Contains(pedHandle))
-                                continue;
-
-                            foreach (string pedModel in ModelList)
+                            if (pModel == GET_HASH_KEY(pedModel))
                             {
-                                GET_CHAR_MODEL(pedHandle, out int pModel);
-
-                                if (pModel == GET_HASH_KEY(pedModel))
-                                    PedList.Add(pedHandle);
-                            }
-                        }
-
-                        foreach (var ped in PedList)
-                        {
-                            if (!DOES_CHAR_EXIST(ped))
-                                continue;
-
-                            if (Main.replaceWeaponEnable)
-                            {
-                                GET_CURRENT_CHAR_WEAPON(ped, out int pedWeap);
-                                GET_CHAR_MODEL(ped, out int pModel);
-
-                                foreach (string pedModel in ModelList)
-                                {
-                                    if (pModel == GET_HASH_KEY(pedModel))
-                                    {
-                                        if (pedWeap != WeaponList[ModelList.IndexOf(pedModel)] && WeaponList[ModelList.IndexOf(pedModel)] > -1)
-                                        {
-                                            GIVE_WEAPON_TO_CHAR(ped, WeaponList[ModelList.IndexOf(pedModel)], 9999, false);
-                                        }
-                                    }
-                                }
-                            }
-                            if (Main.buffAlliesEnable)
-                            {
+                                if (pedWeap != WeaponList[ModelList.IndexOf(pedModel)] && WeaponList[ModelList.IndexOf(pedModel)] > -1)
+                                    GIVE_WEAPON_TO_CHAR(ped, WeaponList[ModelList.IndexOf(pedModel)], 9999, false);
+                                
                                 if (HAS_CHAR_BEEN_DAMAGED_BY_WEAPON(ped, 57))
                                     continue;
 
-                                GET_CHAR_MODEL(ped, out int pModel);
-
-                                foreach (string pedModel in ModelList)
+                                if (HealthList[ModelList.IndexOf(pedModel)] > 0)
                                 {
-                                    if (pModel == GET_HASH_KEY(pedModel))
-                                    {
-                                        GET_CHAR_HEALTH(ped, out uint pHealth);
-                                        SET_CHAR_MAX_HEALTH(ped, (uint)(pHealth + HealthList[ModelList.IndexOf(pedModel)]));
-                                        SET_CHAR_HEALTH(ped, (uint)(pHealth + HealthList[ModelList.IndexOf(pedModel)]));
-                                    }
+                                    GET_CHAR_HEALTH(ped, out uint pHealth);
+                                    SET_CHAR_MAX_HEALTH(ped, (uint)(pHealth + HealthList[ModelList.IndexOf(pedModel)]));
+                                    SET_CHAR_HEALTH(ped, (uint)(pHealth + HealthList[ModelList.IndexOf(pedModel)]));
                                 }
-
-                                GET_CHAR_ARMOUR(ped, out uint pedArmor);
-                                if (pedArmor < 100)
-                                    ADD_ARMOUR_TO_CHAR(ped, 100);
                             }
                         }
+
+                        if (giveArmor)
+                        {
+                            GET_CHAR_ARMOUR(ped, out uint pedArmor);
+                            if (pedArmor < 100)
+                                ADD_ARMOUR_TO_CHAR(ped, 100);
+                        }
                     }
-                    else if (missionName == MissionSCO)
-                    {
-                        PedList.Clear();
-                        missionName = "";
-                    }
+                }
+                else if (missionName == MissionSCO)
+                {
+                    PedList.Clear();
+                    missionName = "";
                 }
             }
         }

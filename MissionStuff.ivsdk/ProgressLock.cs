@@ -35,7 +35,6 @@ namespace MissionStuff.ivsdk
 
         // OtherShit
         private static bool tpThePlayer;
-        private static string cachedMessage;
         public static void Init(SettingsFile settings)
         {
             numberOfLocks = settings.GetInteger("MAIN", "NumberOfLockedMissions", 0);
@@ -70,7 +69,6 @@ namespace MissionStuff.ivsdk
                     {
                         if (GET_FLOAT_STAT(reqStatID) < reqStatProg && !tpThePlayer)
                         {
-                            cachedMessage = tpMessage;
                             SET_PLAYER_CONTROL(Main.PlayerIndex, false);
                             if (IS_CHAR_IN_ANY_CAR(Main.PlayerHandle))
                             {
@@ -92,6 +90,7 @@ namespace MissionStuff.ivsdk
                             FREEZE_CAR_POSITION(pVeh, false);
                             SET_CAR_COORDINATES(pVeh, tpCoords);
                             SET_CAR_HEADING(pVeh, tpHdng);
+                            SET_CAR_ON_GROUND_PROPERLY(pVeh);
                         }
                         else
                         {
@@ -101,7 +100,7 @@ namespace MissionStuff.ivsdk
                         }
                         DO_SCREEN_FADE_IN(1000);
                         SET_PLAYER_CONTROL(Main.PlayerIndex, true);
-                        IVText.TheIVText.ReplaceTextOfTextLabel("PLACEHOLDERSL", cachedMessage);
+                        IVText.TheIVText.ReplaceTextOfTextLabel("PLACEHOLDERSL", tpMessage);
                         PRINT_HELP("PLACEHOLDERSL");
                         //IVGame.ShowSubtitleMessage(tpMessage, 5000);
                         tpThePlayer = false;

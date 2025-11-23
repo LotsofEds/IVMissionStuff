@@ -58,7 +58,6 @@ namespace MissionStuff.ivsdk
         private static int cam;
         private static int cam2;
         private static int interpCam;
-        private static uint gTimer;
         private static uint fTimer;
         public static void UnInit()
         {
@@ -153,7 +152,7 @@ namespace MissionStuff.ivsdk
                     _TASK_DRIVE_BY(Main.PlayerHandle, driverPeds[14], 1, 0, 0, 0, 540, 8, true, 45000);
                 //_TASK_COMBAT(Main.PlayerHandle, driverPeds[14]);
 
-                if (gTimer >= fTimer + 4000 && !endCutscene)
+                if (Main.gTimer >= fTimer + 4000 && !endCutscene)
                 {
                     for (int i = 0; i < 16; i++)
                     {
@@ -177,14 +176,14 @@ namespace MissionStuff.ivsdk
                     SET_CAM_INTERP_STYLE_CORE(interpCam, cam, cam2, 3000, false);
                     endCutscene = true;
                 }
-                else if (endCutscene && gTimer >= fTimer + 7000)
+                else if (endCutscene && Main.gTimer >= fTimer + 7000)
                 {
                     SET_CAM_ACTIVE(cam, false);
                     SET_CAM_ACTIVE(interpCam, false);
                     SET_CAM_ACTIVE(cam2, true);
                     SET_CAM_PROPAGATE(cam2, true);
                     ACTIVATE_SCRIPTED_CAMS(true, true);
-                    if (gTimer >= fTimer + 8000)
+                    if (Main.gTimer >= fTimer + 8000)
                     {
                         SET_INTERP_FROM_SCRIPT_TO_GAME(true, 2000);
                         //DESTROY_ALL_CAMS();
@@ -675,12 +674,11 @@ namespace MissionStuff.ivsdk
         {
             if (NativeGame.IsScriptRunning("bernie3"))
             {
-                GET_GAME_TIMER(out gTimer);
                 if (startChase)
                     ProcessChase();
                 if (triggerCutscene)
                     ChaseEndCutscene();
-                else if (endCutscene && gTimer >= fTimer + 12000)
+                else if (endCutscene && Main.gTimer >= fTimer + 12000)
                     DESTROY_ALL_CAMS();
 
                 else if (IS_THIS_PRINT_BEING_DISPLAYED("BC3_ARRIVE_01", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) || IS_THIS_PRINT_BEING_DISPLAYED("BC3_ARRIVE_02", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) || IS_THIS_PRINT_BEING_DISPLAYED("BC3_ARRIVE_03", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))

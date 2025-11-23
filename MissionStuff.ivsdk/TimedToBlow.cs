@@ -38,7 +38,6 @@ namespace MissionStuff.ivsdk
         private static int currHour;
         private static int currMinute;*/
 
-        private static uint gTimer;
         private static uint fTimer;
 
         // MissionStuff
@@ -68,7 +67,6 @@ namespace MissionStuff.ivsdk
                 {
                     //IVText.TheIVText.ReplaceTextOfTextLabel("TRKBRN_04", newMessage);
                     GET_GAME_TIMER(out fTimer);
-                    GET_GAME_TIMER(out gTimer);
                     startTime = true;
                 }
                 else if (startTime)
@@ -78,7 +76,6 @@ namespace MissionStuff.ivsdk
                     if (IS_THIS_PRINT_BEING_DISPLAYED("TRKBRN_10", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
                         startTime = false;
                     //IVGame.ShowSubtitleMessage(gTimer.ToString() + "  " + (fTimer + 20000).ToString());
-                    GET_GAME_TIMER(out gTimer);
 
                     if (!HAS_MODEL_LOADED(GET_HASH_KEY("rebla")))
                         REQUEST_MODEL(GET_HASH_KEY("rebla"));
@@ -86,7 +83,7 @@ namespace MissionStuff.ivsdk
                     if (!HAS_MODEL_LOADED(GET_HASH_KEY("m_m_gru2_hi_01")))
                         REQUEST_MODEL(GET_HASH_KEY("m_m_gru2_hi_01"));
 
-                    if (gTimer >= fTimer + timeLimit)
+                    if (Main.gTimer >= fTimer + timeLimit)
                     {
                         IVGame.ShowSubtitleMessage("~s~Some ~r~workers~s~ have arrived to guard the place.", 4000);
                         CREATE_CAR(GET_HASH_KEY("rebla"), 618.162f, 1481.202f, 12.465f, out pVeh, true);
@@ -121,9 +118,11 @@ namespace MissionStuff.ivsdk
                         // 611.162, 1528.842, 20.465, 270.304
                     }
 
-                    if (gTimer >= fTimer + (timeLimit - 30000) && !hasWarned)
+                    if (Main.gTimer >= fTimer + (timeLimit - 30000) && !hasWarned)
                     {
-                        IVGame.ShowSubtitleMessage(warnMessage, 4000);
+                        IVText.TheIVText.ReplaceTextOfTextLabel("PLACEHOLDERSL", warnMessage);
+                        PRINT_HELP("PLACEHOLDERSL");
+                        //IVGame.ShowSubtitleMessage(warnMessage, 4000);
                         hasWarned = true;
                     }
                     //SET_PLAYER_INVISIBLE_TO_AI

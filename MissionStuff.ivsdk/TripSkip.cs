@@ -34,7 +34,6 @@ namespace MissionStuff.ivsdk
         private static bool activateTripSkip;
         private static bool endSkipTrip;
         private static bool printHelp;
-        private static uint gTimer;
         private static uint fTimer;
         private static int pVehicle;
 
@@ -185,8 +184,7 @@ namespace MissionStuff.ivsdk
                             STORE_SCORE(Main.PlayerIndex, out uint pMoney);
                             if (NativeControls.IsGameKeyPressed(0, tripSkipKey))
                             {
-                                GET_GAME_TIMER(out gTimer);
-                                if (gTimer >= fTimer + 2000)
+                                if (Main.gTimer >= fTimer + 2000)
                                 {
                                     if (!chargeMoney || (chargeMoney && pMoney >= ((int)(pDist * costMult))))
                                     {
@@ -240,9 +238,8 @@ namespace MissionStuff.ivsdk
                 SET_CHAR_COORDINATES(Main.PlayerHandle, teleportCoords);
                 SET_CHAR_HEADING(pVehicle, teleportHdng);
             }
-            GET_GAME_TIMER(out gTimer);
 
-            if (gTimer >= fTimer + 2500)
+            if (Main.gTimer >= fTimer + 2500)
                 endSkipTrip = true;
         }
         private static void EndTrip()

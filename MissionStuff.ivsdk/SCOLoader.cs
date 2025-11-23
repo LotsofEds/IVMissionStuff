@@ -29,13 +29,16 @@ namespace MissionStuff.ivsdk
         }
         public static void Tick()
         {
-            foreach (string SCOName in SCOList)
+            if (!IS_SCREEN_FADED_OUT())
             {
-                if (!NativeGame.IsScriptRunning(SCOName))
+                foreach (string SCOName in SCOList)
                 {
-                    REQUEST_SCRIPT(SCOName);
-                    if (HAS_SCRIPT_LOADED(SCOName))
-                        NativeGame.StartNewScript(SCOName, 1024);
+                    if (!NativeGame.IsScriptRunning(SCOName))
+                    {
+                        REQUEST_SCRIPT(SCOName);
+                        if (HAS_SCRIPT_LOADED(SCOName))
+                            NativeGame.StartNewScript(SCOName, 1024);
+                    }
                 }
             }
         }

@@ -28,7 +28,6 @@ namespace MissionStuff.ivsdk
         private static bool tpThePlayer;
 
         // OtherShit
-        private static uint gTimer;
         private static uint fTimer;
 
         private static int objHandle;
@@ -49,7 +48,6 @@ namespace MissionStuff.ivsdk
                 {
                     //IVText.TheIVText.ReplaceTextOfTextLabel("EB4X01", newMessage);
                     GET_GAME_TIMER(out fTimer);
-                    GET_GAME_TIMER(out gTimer);
                     startTime = true;
                 }
                 else if (startTime)
@@ -59,12 +57,11 @@ namespace MissionStuff.ivsdk
                     if (LOCATE_CHAR_IN_CAR_3D(Main.PlayerHandle, 1223.573f, 694.0489f, 39.02f, 2.5f, 2.5f, 2.5f, false))
                         startTime = false;
                     //IVGame.ShowSubtitleMessage(gTimer.ToString() + "  " + (fTimer + timeLimit).ToString());
-                    GET_GAME_TIMER(out gTimer);
 
                     if (!HAS_MODEL_LOADED(GET_HASH_KEY("p_water_tow_2")))
                         REQUEST_MODEL(GET_HASH_KEY("p_water_tow_2"));
 
-                    if (gTimer >= fTimer + timeLimit)
+                    if (Main.gTimer >= fTimer + timeLimit)
                     {
                         IVGame.ShowSubtitleMessage("~s~The doctor is out. ~y~Dispose of the bodies~s~ some other way.", 5000);
 
@@ -75,7 +72,7 @@ namespace MissionStuff.ivsdk
                         startTime = false;
                     }
 
-                    if ((gTimer >= fTimer + (timeLimit - 30000)) && !hasWarned)
+                    if ((Main.gTimer >= fTimer + (timeLimit - 30000)) && !hasWarned)
                     {
                         IVGame.ShowSubtitleMessage(warnMessage, 4000);
                         hasWarned = true;

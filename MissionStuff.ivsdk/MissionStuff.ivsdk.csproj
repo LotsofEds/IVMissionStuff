@@ -51,9 +51,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArmoredAllies.cs" />
+    <Compile Include="BetterRaceAI.cs" />
     <Compile Include="BuoysAhoy.cs" />
+    <Compile Include="EscuelaOfTheSleep.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="HaveAHeartTimed.cs" />
+    <Compile Include="Pills.cs" />
     <Compile Include="ProgressLock.cs" />
     <Compile Include="SCOLoader.cs" />
     <Compile Include="TimedToBlow.cs" />
@@ -61,8 +64,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoveProofs.cs" />
     <Compile Include="TripSkip.cs" />
+    <Compile Include="VehHelper.cs" />
     <Compile Include="WantedStars.cs" />
-    <Compile Include="WeaponReplace.cs" />
+    <Compile Include="BuffedEnemies.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -14,7 +14,7 @@ using static IVSDKDotNet.Native.Natives;
 
 namespace MissionStuff.ivsdk
 {
-    internal class WeaponReplace
+    internal class BuffedEnemies
     {
         private static readonly List<string> SCOList = new List<string>();
         public static readonly List<string> ModelList = new List<string>();
@@ -24,10 +24,11 @@ namespace MissionStuff.ivsdk
 
         private static string missionName;
         private static bool giveArmor;
+        private static uint healthIncrease;
 
         public static void Init(SettingsFile settings)
         {
-            string SCOString = settings.GetValue("MAIN", "WeaponReplaceSCOList", "");
+            string SCOString = settings.GetValue("MAIN", "BuffEnemiesSCOList", "");
 
             SCOList.Clear();
             foreach (string SCOName in SCOString.Split(','))
@@ -62,6 +63,7 @@ namespace MissionStuff.ivsdk
             }
 
             giveArmor = settings.GetBoolean(scoName, "EnemiesHaveArmor", false);
+            healthIncrease = settings.GetUInteger(scoName, "EnemyHealthIncrease", 0);
         }
         public static void Tick()
         {
@@ -123,10 +125,16 @@ namespace MissionStuff.ivsdk
                         if (HAS_CHAR_BEEN_DAMAGED_BY_WEAPON(ped, 57))
                             continue;
 
-                        GET_CHAR_ARMOUR(ped, out uint pedArmor);
+                        GET_CHAR_HEALTH(ped, out uint pHealth);
+                        SET_CHAR_MAX_HEALTH(ped, (uint)(pHealth + healthIncrease));
+                        SET_CHAR_HEALTH(ped, (uint)(pHealth + healthIncrease));
 
-                        if (giveArmor && pedArmor < 100)
-                            ADD_ARMOUR_TO_CHAR(ped, 100);
+                        if (giveArmor)
+                        {
+                            GET_CHAR_ARMOUR(ped, out uint pedArmor);
+                            if (pedArmor < 100)
+                                ADD_ARMOUR_TO_CHAR(ped, 100);
+                        }
                     }
                 }
                 else if (missionName == MissionSCO)

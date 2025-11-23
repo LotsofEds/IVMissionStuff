@@ -25,25 +25,31 @@ namespace MissionStuff.ivsdk
         public static bool buffAlliesEnable;
         public static bool noProofsEnable;
         public static bool moreWantedEnable;
-        public static bool replaceWeaponEnable;
+        public static bool buffEnemiesEnable;
         public static bool SCOLoadEnable;
         public static bool missionLockEnable;
+        public static bool betterRaceEnable;
+        public static bool pillsEnable;
 
         // MissionShit
         public static bool timedToBlowEnable;
         public static bool heartTimeEnable;
         public static bool buoysAhoyEnable;
+        public static bool escuelaOfTheSleepEnable;
 
         // SettingsFileShit
         public static SettingsFile mainSettings;
 
         // OtherShit
         public static bool dontCrash = false;
+        public static uint gTimer;
         public Main()
         {
             Uninitialize += Main_Uninitialize;
             Initialized += Main_Initialized;
             GameLoad += Main_GameLoad;
+            KeyDown += Main_KeyDown;
+            KeyUp += Main_KeyUp;
             Tick += Main_Tick;
         }
         private void Main_GameLoad(object sender, EventArgs e)
@@ -56,6 +62,31 @@ namespace MissionStuff.ivsdk
             TripSkip.UnInit();
             TimedToBlow.UnInit();
             BuoysAhoy.UnInit();
+            EscuelaOfTheSleep.UnInit();
+            Pills.UnInit();
+        }
+
+        private void Main_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (!InitialChecks())
+                return;
+
+            if (PlayerPed == null)
+                return;
+
+            if (pillsEnable)
+                Pills.KeyDown();
+        }
+        private void Main_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (!InitialChecks())
+                return;
+
+            if (PlayerPed == null)
+                return;
+
+            if (pillsEnable)
+                Pills.KeyUp();
         }
 
         private void Main_Initialized(object sender, EventArgs e)
@@ -65,24 +96,33 @@ namespace MissionStuff.ivsdk
             Init(Settings);
             if (tripSkipEnable)
                 TripSkip.Init(Settings);
-            if (buffAlliesEnable || replaceWeaponEnable)
+            if (buffAlliesEnable)
                 ArmoredAllies.Init(Settings);
-            if (replaceWeaponEnable)
-                WeaponReplace.Init(Settings);
+            if (buffEnemiesEnable)
+                BuffedEnemies.Init(Settings);
             if (noProofsEnable)
                 RemoveProofs.Init(Settings);
             if (moreWantedEnable)
                 WantedStars.Init(Settings);
+            if (SCOLoadEnable)
+                SCOLoader.Init(Settings);
+            if (missionLockEnable)
+                ProgressLock.Init(Settings);
+            if (missionLockEnable)
+                ProgressLock.Init(Settings);
+            if (betterRaceEnable)
+                BetterRaceAI.Init(Settings);
+            if (pillsEnable)
+                Pills.Init(Settings);
+
             if (timedToBlowEnable)
                 TimedToBlow.Init(Settings);
             if (heartTimeEnable)
                 HaveAHeartTimed.Init(Settings);
             if (buoysAhoyEnable)
                 BuoysAhoy.Init(Settings);
-            if (SCOLoadEnable)
-                SCOLoader.Init(Settings);
-            if (missionLockEnable)
-                ProgressLock.Init(Settings);
+            if (escuelaOfTheSleepEnable)
+                EscuelaOfTheSleep.Init();
         }
         public static bool InitialChecks()
         {
@@ -93,15 +133,18 @@ namespace MissionStuff.ivsdk
         {
             tripSkipEnable = settings.GetBoolean("MAIN", "TripSkip", false);
             buffAlliesEnable = settings.GetBoolean("MAIN", "BuffAllies", false);
+            buffEnemiesEnable = settings.GetBoolean("MAIN", "BuffEnemies", false);
             noProofsEnable = settings.GetBoolean("MAIN", "RemoveEnemyProofs", false);
             moreWantedEnable = settings.GetBoolean("MAIN", "MoreWantedStars", false);
-            replaceWeaponEnable = settings.GetBoolean("MAIN", "ReplaceMissionPedWeapons", false);
             SCOLoadEnable = settings.GetBoolean("MAIN", "SCOLoader", false);
             missionLockEnable = settings.GetBoolean("MAIN", "MissionLocks", false);
+            betterRaceEnable = settings.GetBoolean("MAIN", "BetterRaceAI", false);
+            pillsEnable = settings.GetBoolean("MAIN", "PackiePills", false);
 
             timedToBlowEnable = settings.GetBoolean("MAIN", "TimedToBlow", false);
             heartTimeEnable = settings.GetBoolean("MAIN", "Pacemaker", false);
             buoysAhoyEnable = settings.GetBoolean("MAIN", "BuoysAhoyRevamp", false);
+            escuelaOfTheSleepEnable = settings.GetBoolean("MAIN", "EscuelaOfTheSleep", false);
         }
         private void Main_Tick(object sender, EventArgs e)
         {
@@ -116,7 +159,10 @@ namespace MissionStuff.ivsdk
             if (PlayerPed == null)
                 return;
 
+            GET_GAME_TIMER(out gTimer);
+
             PedHelper.GrabAllPeds();
+            VehHelper.GrabAllVehicles();
 
             if (tripSkipEnable)
                 TripSkip.Tick();
@@ -124,15 +170,20 @@ namespace MissionStuff.ivsdk
                 RemoveProofs.Tick();
             if (moreWantedEnable)
                 WantedStars.Tick();
-            if (replaceWeaponEnable)
-                WeaponReplace.Tick();
+            if (buffAlliesEnable)
+                ArmoredAllies.Tick();
+            if (buffEnemiesEnable)
+                BuffedEnemies.Tick();
             if (missionLockEnable)
                 ProgressLock.Tick();
             if (SCOLoadEnable)
                 SCOLoader.Tick();
+            if (betterRaceEnable)
+                BetterRaceAI.Tick();
+            if (pillsEnable)
+                Pills.Tick();
 
             //SET_CHAR_PROOFS(Main.PlayerHandle, false, false, false, false, false);
-            ArmoredAllies.Tick();
 
             if (timedToBlowEnable)
                 TimedToBlow.Tick();
@@ -140,6 +191,8 @@ namespace MissionStuff.ivsdk
                 HaveAHeartTimed.Tick();
             if (buoysAhoyEnable)
                 BuoysAhoy.Tick();
+            if (escuelaOfTheSleepEnable)
+                EscuelaOfTheSleep.Tick();
         }
     }
 }
