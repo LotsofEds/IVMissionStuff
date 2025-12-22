@@ -40,11 +40,11 @@ namespace MissionStuff.ivsdk
             pVeh = -1;
             checkPointNum = -1;
 
-            checkPoints[0] = new Vector3(958.958f, 1911.297f, 22.781f);
-            checkPoints[1] = new Vector3(951.624f, 1721.242f, 16.296f);
-            checkPoints[2] = new Vector3(847.391f, 1777.954f, 17.218f);
-            checkPoints[3] = new Vector3(740.178f, 1582.625f, 21.964f);
-            checkPoints[4] = new Vector3(738.763f, 1365.499f, 13.986f);
+            checkPoints[0] = new Vector3(964.704f, 1879.377f, 22.987f);
+            checkPoints[1] = new Vector3(907.906f, 1757.646f, 16.765f);
+            checkPoints[2] = new Vector3(738.846f, 1558.068f, 22.342f);
+            checkPoints[3] = new Vector3(724.196f, 1362.297f, 14.251f);
+            checkPoints[4] = new Vector3(690.368f, 1389.113f, 14.279f);
         }
         public static void Tick()
         {
@@ -69,18 +69,11 @@ namespace MissionStuff.ivsdk
 
                             if (pModel == GET_HASH_KEY("m_y_gafr_hi_01"))
                             {
-                                SET_CAR_DENSITY_MULTIPLIER(0.2f);
+                                SET_CAR_DENSITY_MULTIPLIER(0.1f);
                                 GET_CAR_CHAR_IS_USING(pedHandle, out pVeh);
                                 targetPed = pedHandle;
                                 GET_GAME_TIMER(out fTimer);
                                 checkPointNum = 0;
-
-                                // 958.958f, 1911.297f, 22.781f
-                                // 951.624f, 1721.242f, 16.296f
-                                // 847.391f, 1777.954f, 17.218f
-                                // 740.178f, 1582.625f, 21.964f
-                                // 738.763f, 1364.499f, 13.986f
-                                // 686.204f, 1456.223f, 14.145f
                             }
                         }
                     }
@@ -90,10 +83,10 @@ namespace MissionStuff.ivsdk
                         {
                             GET_GAME_TIMER(out fTimer);
                             CLEAR_CHAR_TASKS(targetPed);
-                            _TASK_CAR_DRIVE_TO_COORD(targetPed, pVeh, checkPoints[checkPointNum].X, checkPoints[checkPointNum].Y, checkPoints[checkPointNum].Z, 15.0f, 0, 0, 2, 4.0f, -1);
+                            _TASK_CAR_DRIVE_TO_COORD(targetPed, pVeh, checkPoints[checkPointNum].X, checkPoints[checkPointNum].Y, checkPoints[checkPointNum].Z, 20.0f, 0, 0, 2, 4.0f, -1);
                         }
 
-                        if (LOCATE_CHAR_IN_CAR_3D(targetPed, checkPoints[checkPointNum].X, checkPoints[checkPointNum].Y, checkPoints[checkPointNum].Z, 5.0f, 5.0f, 5.0f, false))
+                        if (LOCATE_CHAR_IN_CAR_3D(targetPed, checkPoints[checkPointNum].X, checkPoints[checkPointNum].Y, checkPoints[checkPointNum].Z, 7.5f, 7.5f, 7.5f, false))
                             checkPointNum++;
                     }
                 }

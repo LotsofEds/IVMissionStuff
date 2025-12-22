@@ -75,7 +75,8 @@ namespace MissionStuff.ivsdk
             MARK_MODEL_AS_NO_LONGER_NEEDED(GET_HASH_KEY("squalo"));
             MARK_MODEL_AS_NO_LONGER_NEEDED(GET_HASH_KEY("jetmax"));
             MARK_MODEL_AS_NO_LONGER_NEEDED(GET_HASH_KEY("bm_drum_fla2"));
-            MARK_MODEL_AS_NO_LONGER_NEEDED(GET_HASH_KEY("m_y_grus_lo_01"));
+            MARK_MODEL_AS_NO_LONGER_NEEDED(GET_HASH_KEY("m_y_gru2_lo_01"));
+            MARK_MODEL_AS_NO_LONGER_NEEDED(GET_HASH_KEY("m_m_gru2_lo_02"));
 
             MARK_OBJECT_AS_NO_LONGER_NEEDED(barrelOne);
             MARK_OBJECT_AS_NO_LONGER_NEEDED(barrelTwo);
@@ -300,11 +301,11 @@ namespace MissionStuff.ivsdk
                 SET_CAR_HEADING(enemyVehicles[0], 90);
                 //SET_CAR_HEADING(enemyVehicles[1], 90);
 
-                CREATE_CHAR_INSIDE_CAR(enemyVehicles[0], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[0]);
-                //CREATE_CHAR_INSIDE_CAR(enemyVehicles[1], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[1]);
+                CREATE_CHAR_INSIDE_CAR(enemyVehicles[0], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_gru2_lo_01"), out driverPeds[0]);
+                //CREATE_CHAR_INSIDE_CAR(enemyVehicles[1], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_gru2_lo_01"), out driverPeds[1]);
 
-                CREATE_CHAR_AS_PASSENGER(enemyVehicles[0], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[0]);
-                //CREATE_CHAR_AS_PASSENGER(enemyVehicles[1], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[1]);
+                CREATE_CHAR_AS_PASSENGER(enemyVehicles[0], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_gru2_lo_01"), 0, out shooterPeds[0]);
+                //CREATE_CHAR_AS_PASSENGER(enemyVehicles[1], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_gru2_lo_01"), 0, out shooterPeds[1]);
 
                 _TASK_CAR_DRIVE_TO_COORD(driverPeds[0], enemyVehicles[0], 900.053f, -892.568f, 0.0f, 25.0f, 1, 0, 0, 20.0f, 45000);
                 //_TASK_CAR_DRIVE_TO_COORD(driverPeds[1], enemyVehicles[1], 900.053f, -892.568f, 0.0f, 25.0f, 1, 0, 0, 20.0f, 45000);
@@ -330,8 +331,8 @@ namespace MissionStuff.ivsdk
                     {
                         _TASK_CAR_DRIVE_TO_COORD(berniePed, pVeh, 782.036f, -862.989f, 0.0f, 25.0f, 1, 0, 0, 20.0f, 45000);
 
-                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[1], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[1]);
-                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[1], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[1]);
+                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[1], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_gru2_lo_01"), out driverPeds[1]);
+                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[1], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_m_gru2_lo_02"), 0, out shooterPeds[1]);
 
                         _TASK_CAR_DRIVE_TO_COORD(driverPeds[1], enemyVehicles[1], 782.036f, -862.989f, 0.0f, 25.0f, 1, 0, 0, 20.0f, 45000);
                         GIVE_WEAPON_TO_CHAR(shooterPeds[1], enemyWeaponB, 9999, true);
@@ -343,8 +344,8 @@ namespace MissionStuff.ivsdk
                     {
                         _TASK_CAR_DRIVE_TO_COORD(berniePed, pVeh, 680.764f, -831.553f, 0.0f, 25.0f, 1, 0, 0, 20.0f, 45000);
 
-                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[2], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[2]);
-                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[2], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[2]);
+                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[2], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_m_gru2_lo_02"), out driverPeds[2]);
+                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[2], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_m_gru2_lo_02"), 0, out shooterPeds[2]);
 
                         _TASK_CAR_DRIVE_TO_COORD(driverPeds[2], enemyVehicles[2], 680.764f, -831.553f, 0.0f, 25.0f, 1, 0, 0, 20.0f, 45000);
                         GIVE_WEAPON_TO_CHAR(shooterPeds[2], enemyWeaponB, 9999, true);
@@ -361,14 +362,14 @@ namespace MissionStuff.ivsdk
                     {
                         _TASK_CAR_DRIVE_TO_COORD(berniePed, pVeh, 580.851f, -508.069f, 0.0f, 20.0f, 1, 0, 0, 20.0f, 45000);
 
-                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[3], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[3]);
-                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[3], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[3]);
+                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[3], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_m_gru2_lo_02"), out driverPeds[3]);
+                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[3], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_gru2_lo_01"), 0, out shooterPeds[3]);
 
                         _TASK_CAR_DRIVE_TO_COORD(driverPeds[3], enemyVehicles[3], 580.851f, -508.069f, 0.0f, 18.0f, 1, 0, 0, 20.0f, 45000);
                         GIVE_WEAPON_TO_CHAR(shooterPeds[3], enemyWeaponA, 9999, true);
 
-                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[4], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[4]);
-                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[4], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[4]);
+                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[4], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_gru2_lo_01"), out driverPeds[4]);
+                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[4], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_m_gru2_lo_02"), 0, out shooterPeds[4]);
 
                         _TASK_CAR_DRIVE_TO_COORD(driverPeds[4], enemyVehicles[4], 580.851f, -508.069f, 0.0f, 14.0f, 1, 0, 0, 17.0f, 45000);
                         GIVE_WEAPON_TO_CHAR(shooterPeds[4], enemyWeaponB, 9999, true);
@@ -402,14 +403,14 @@ namespace MissionStuff.ivsdk
                     {
                         _TASK_CAR_DRIVE_TO_COORD(berniePed, pVeh, 460.292f, -310.086f, 0.0f, 20.0f, 1, 0, 0, 20.0f, 45000);
 
-                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[5], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[5]);
-                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[5], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[5]);
+                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[5], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_gru2_lo_01"), out driverPeds[5]);
+                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[5], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_m_gru2_lo_02"), 0, out shooterPeds[5]);
 
                         _TASK_CAR_DRIVE_TO_COORD(driverPeds[5], enemyVehicles[5], 435.292f, -431.086f, 0.0f, 15.0f, 1, 0, 0, 10.0f, 45000);
                         GIVE_WEAPON_TO_CHAR(shooterPeds[5], enemyWeaponB, 9999, true);
 
-                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[6], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[6]);
-                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[6], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[6]);
+                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[6], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_gru2_lo_01"), out driverPeds[6]);
+                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[6], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_m_gru2_lo_02"), 0, out shooterPeds[6]);
 
                         _TASK_CAR_DRIVE_TO_COORD(driverPeds[6], enemyVehicles[6], 410.292f, -310.086f, 0.0f, 15.0f, 1, 0, 0, 20.0f, 45000);
                         GIVE_WEAPON_TO_CHAR(shooterPeds[6], enemyWeaponA, 9999, true);
@@ -428,8 +429,8 @@ namespace MissionStuff.ivsdk
                     {
                         _TASK_CAR_DRIVE_TO_COORD(berniePed, pVeh, 414.805f, -196.915f, 0.0f, 25.0f, 1, 0, 0, 10.0f, 45000);
 
-                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[7], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[7]);
-                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[7], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[7]);
+                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[7], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_gru2_lo_01"), out driverPeds[7]);
+                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[7], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_gru2_lo_01"), 0, out shooterPeds[7]);
 
                         _TASK_CAR_DRIVE_TO_COORD(driverPeds[7], enemyVehicles[7], 376.749f, -81.512f, 0.0f, 11.0f, 1, 0, 0, 20.0f, 45000);
                         GIVE_WEAPON_TO_CHAR(shooterPeds[7], enemyWeaponB, 9999, true);
@@ -469,14 +470,14 @@ namespace MissionStuff.ivsdk
                     {
                         _TASK_CAR_DRIVE_TO_COORD(berniePed, pVeh, 265.203f, 381.674f, 0.0f, 20.0f, 1, 0, 0, 20.0f, 45000);
 
-                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[8], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[8]);
-                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[8], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[8]);
+                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[8], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_m_gru2_lo_02"), out driverPeds[8]);
+                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[8], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_gru2_lo_01"), 0, out shooterPeds[8]);
 
                         _TASK_CAR_DRIVE_TO_COORD(driverPeds[8], enemyVehicles[8], 265.203f, 381.674f, 0.0f, 20.0f, 1, 0, 0, 20.0f, 45000);
                         GIVE_WEAPON_TO_CHAR(shooterPeds[8], enemyWeaponB, 9999, true);
 
-                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[9], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[9]);
-                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[9], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[9]);
+                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[9], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_m_gru2_lo_02"), out driverPeds[9]);
+                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[9], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_m_gru2_lo_02"), 0, out shooterPeds[9]);
 
                         _TASK_CAR_DRIVE_TO_COORD(driverPeds[9], enemyVehicles[9], 259.477f, 490.362f, 0.0f, 15.0f, 1, 0, 0, 20.0f, 45000);
                         GIVE_WEAPON_TO_CHAR(shooterPeds[9], enemyWeaponA, 9999, true);
@@ -503,8 +504,8 @@ namespace MissionStuff.ivsdk
 
                         MARK_CAR_AS_NO_LONGER_NEEDED(enemyVehicles[7]);
 
-                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[10], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[10]);
-                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[10], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[10]);
+                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[10], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_gru2_lo_01"), out driverPeds[10]);
+                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[10], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_m_gru2_lo_02"), 0, out shooterPeds[10]);
 
                         _TASK_CAR_DRIVE_TO_COORD(driverPeds[10], enemyVehicles[10], 250.312f, 708.392f, 0.0f, 16.0f, 1, 0, 0, 20.0f, 45000);
                         GIVE_WEAPON_TO_CHAR(shooterPeds[10], enemyWeaponA, 9999, true);
@@ -522,15 +523,15 @@ namespace MissionStuff.ivsdk
                         _TASK_CAR_DRIVE_TO_COORD(berniePed, pVeh, 256.771f, 831.921f, 0.0f, 25.0f, 1, 0, 0, 20.0f, 45000);
 
                         // 397.037, 1059.955, 2.72, 90
-                        CREATE_CHAR((int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, GET_HASH_KEY("m_y_grus_lo_01"), 397.037f, 1059.955f, 1.92f, out landEnemyPeds[0], true);
+                        CREATE_CHAR((int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, GET_HASH_KEY("m_y_gru2_lo_01"), 397.037f, 1059.955f, 1.92f, out landEnemyPeds[0], true);
                         // 397.037, 1072.724, 2.72, 90
-                        CREATE_CHAR((int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, GET_HASH_KEY("m_y_grus_lo_01"), 397.037f, 1072.724f, 1.92f, out landEnemyPeds[1], true);
+                        CREATE_CHAR((int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, GET_HASH_KEY("m_y_gru2_lo_01"), 397.037f, 1072.724f, 1.92f, out landEnemyPeds[1], true);
                         // 397.037, 1081.338, 2.72, 90
-                        CREATE_CHAR((int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, GET_HASH_KEY("m_y_grus_lo_01"), 397.037f, 1081.338f, 1.92f, out landEnemyPeds[2], true);
+                        CREATE_CHAR((int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, GET_HASH_KEY("m_m_gru2_lo_02"), 397.037f, 1081.338f, 1.92f, out landEnemyPeds[2], true);
                         // 397.037, 1107.842, 2.72, 90
-                        CREATE_CHAR((int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, GET_HASH_KEY("m_y_grus_lo_01"), 397.037f, 1107.842f, 1.92f, out landEnemyPeds[3], true);
+                        CREATE_CHAR((int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, GET_HASH_KEY("m_y_gru2_lo_01"), 397.037f, 1107.842f, 1.92f, out landEnemyPeds[3], true);
                         // 397.037, 1119.625, 2.72, 90
-                        CREATE_CHAR((int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, GET_HASH_KEY("m_y_grus_lo_01"), 397.037f, 1119.625f, 1.92f, out landEnemyPeds[4], true);
+                        CREATE_CHAR((int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, GET_HASH_KEY("m_m_gru2_lo_02"), 397.037f, 1119.625f, 1.92f, out landEnemyPeds[4], true);
 
                         GIVE_WEAPON_TO_CHAR(landEnemyPeds[0], enemyWeaponA, 9999, true);
                         GIVE_WEAPON_TO_CHAR(landEnemyPeds[1], enemyWeaponB, 9999, true);
@@ -544,14 +545,14 @@ namespace MissionStuff.ivsdk
                             SET_CHAR_HEADING(landEnemyPeds[i], 90);
                         }
 
-                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[11], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[11]);
-                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[11], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[11]);
+                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[11], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_gru2_lo_01"), out driverPeds[11]);
+                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[11], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_m_gru2_lo_02"), 0, out shooterPeds[11]);
 
                         _TASK_CAR_DRIVE_TO_COORD(driverPeds[11], enemyVehicles[11], 379.606f, 965.348f, 0.0f, 18.0f, 1, 0, 0, 18.0f, 45000);
                         GIVE_WEAPON_TO_CHAR(shooterPeds[11], enemyWeaponB, 9999, true);
 
-                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[12], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[12]);
-                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[12], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[12]);
+                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[12], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_gru2_lo_01"), out driverPeds[12]);
+                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[12], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_m_gru2_lo_02"), 0, out shooterPeds[12]);
 
                         _TASK_CAR_DRIVE_TO_COORD(driverPeds[12], enemyVehicles[12], 256.771f, 831.921f, 0.0f, 20.0f, 1, 0, 0, 20.0f, 45000);
                         GIVE_WEAPON_TO_CHAR(shooterPeds[12], enemyWeaponA, 9999, true);
@@ -564,20 +565,20 @@ namespace MissionStuff.ivsdk
                     {
                         _TASK_CAR_DRIVE_TO_COORD(berniePed, pVeh, 369.606f, 965.348f, 0.0f, 25.0f, 1, 0, 0, 20.0f, 45000);
 
-                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[13], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[13]);
-                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[13], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[13]);
+                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[13], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_gru2_lo_01"), out driverPeds[13]);
+                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[13], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_gru2_lo_01"), 0, out shooterPeds[13]);
 
                         _TASK_CAR_DRIVE_TO_COORD(driverPeds[13], enemyVehicles[13], 674.991f, 1111.501f, 0.0f, 17.0f, 1, 0, 0, 20.0f, 45000);
                         GIVE_WEAPON_TO_CHAR(shooterPeds[13], enemyWeaponA, 9999, true);
 
                         // 397.037, 1059.955, 2.72, 90
-                        CREATE_CHAR((int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, GET_HASH_KEY("m_y_grus_lo_01"), 406.624f, 1121.498f, 1.92f, out landEnemyPeds[5], true);
+                        CREATE_CHAR((int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, GET_HASH_KEY("m_m_gru2_lo_02"), 406.624f, 1121.498f, 1.92f, out landEnemyPeds[5], true);
                         // 397.037, 1072.724, 2.72, 90
-                        CREATE_CHAR((int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, GET_HASH_KEY("m_y_grus_lo_01"), 419.318f, 1121.498f, 1.92f, out landEnemyPeds[6], true);
+                        CREATE_CHAR((int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, GET_HASH_KEY("m_m_gru2_lo_02"), 419.318f, 1121.498f, 1.92f, out landEnemyPeds[6], true);
                         // 397.037, 1081.338, 2.72, 90
-                        //CREATE_CHAR((int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, GET_HASH_KEY("m_y_grus_lo_01"), 585.210f, 1124.123f, 0.384f, out landEnemyPeds[7], true);
+                        //CREATE_CHAR((int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, GET_HASH_KEY("m_y_gru2_lo_01"), 585.210f, 1124.123f, 0.384f, out landEnemyPeds[7], true);
                         // 397.037, 1107.842, 2.72, 90
-                        //CREATE_CHAR((int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, GET_HASH_KEY("m_y_grus_lo_01"), 593.662f, 1124.123f, 2.275f, out landEnemyPeds[8], true);
+                        //CREATE_CHAR((int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, GET_HASH_KEY("m_y_gru2_lo_01"), 593.662f, 1124.123f, 2.275f, out landEnemyPeds[8], true);
 
                         GIVE_WEAPON_TO_CHAR(landEnemyPeds[5], enemyWeaponB, 9999, true);
                         GIVE_WEAPON_TO_CHAR(landEnemyPeds[6], enemyWeaponB, 9999, true);
@@ -616,8 +617,8 @@ namespace MissionStuff.ivsdk
                     {
                         _TASK_CAR_DRIVE_TO_COORD(berniePed, pVeh, 472.502f, 1136.906f, 0.0f, 25.0f, 1, 0, 0, 20.0f, 45000);
 
-                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[14], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), out driverPeds[14]);
-                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[14], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_grus_lo_01"), 0, out shooterPeds[14]);
+                        CREATE_CHAR_INSIDE_CAR(enemyVehicles[14], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_m_gru2_lo_02"), out driverPeds[14]);
+                        CREATE_CHAR_AS_PASSENGER(enemyVehicles[14], (int)ePedType.PED_TYPE_GANG_RUSSIAN_GANG, (uint)GET_HASH_KEY("m_y_gru2_lo_01"), 0, out shooterPeds[14]);
 
                         _TASK_CAR_DRIVE_TO_COORD(driverPeds[14], enemyVehicles[14], 679.895f, 1145.142f, 0.0f, 12.0f, 1, 0, 0, 20.0f, 45000);
                         GIVE_WEAPON_TO_CHAR(shooterPeds[14], enemyWeaponB, 9999, true);
@@ -681,7 +682,7 @@ namespace MissionStuff.ivsdk
                 else if (endCutscene && Main.gTimer >= fTimer + 12000)
                     DESTROY_ALL_CAMS();
 
-                else if (IS_THIS_PRINT_BEING_DISPLAYED("BC3_ARRIVE_01", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) || IS_THIS_PRINT_BEING_DISPLAYED("BC3_ARRIVE_02", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) || IS_THIS_PRINT_BEING_DISPLAYED("BC3_ARRIVE_03", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+                else if (LOCATE_CHAR_IN_CAR_3D(Main.PlayerHandle, 1129.244f, -883.3863f, 1.5f, 2.5f, 2.5f, 2.5f, false))
                 {
                     if (!HAS_MODEL_LOADED(GET_HASH_KEY("squalo")))
                         REQUEST_MODEL(GET_HASH_KEY("squalo"));
@@ -692,8 +693,11 @@ namespace MissionStuff.ivsdk
                     if (!HAS_MODEL_LOADED(GET_HASH_KEY("bm_drum_fla2")))
                         REQUEST_MODEL(GET_HASH_KEY("bm_drum_fla2"));
 
-                    if (!HAS_MODEL_LOADED(GET_HASH_KEY("m_y_grus_lo_01")))
-                        REQUEST_MODEL(GET_HASH_KEY("m_y_grus_lo_01"));
+                    if (!HAS_MODEL_LOADED(GET_HASH_KEY("m_y_gru2_lo_01")))
+                        REQUEST_MODEL(GET_HASH_KEY("m_y_gru2_lo_01"));
+
+                    if (!HAS_MODEL_LOADED(GET_HASH_KEY("m_m_gru2_lo_02")))
+                        REQUEST_MODEL(GET_HASH_KEY("m_m_gru2_lo_02"));
 
                     if (IS_CHAR_SITTING_IN_ANY_CAR(Main.PlayerHandle))
                         GET_CAR_CHAR_IS_USING(Main.PlayerHandle, out pVeh);
@@ -770,7 +774,8 @@ namespace MissionStuff.ivsdk
                 MARK_MODEL_AS_NO_LONGER_NEEDED(GET_HASH_KEY("squalo"));
                 MARK_MODEL_AS_NO_LONGER_NEEDED(GET_HASH_KEY("jetmax"));
                 MARK_MODEL_AS_NO_LONGER_NEEDED(GET_HASH_KEY("bm_drum_fla2"));
-                MARK_MODEL_AS_NO_LONGER_NEEDED(GET_HASH_KEY("m_y_grus_lo_01"));
+                MARK_MODEL_AS_NO_LONGER_NEEDED(GET_HASH_KEY("m_y_gru2_lo_01"));
+                MARK_MODEL_AS_NO_LONGER_NEEDED(GET_HASH_KEY("m_m_gru2_lo_02"));
 
                 MARK_OBJECT_AS_NO_LONGER_NEEDED(barrelOne);
                 MARK_OBJECT_AS_NO_LONGER_NEEDED(barrelTwo);

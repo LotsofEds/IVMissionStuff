@@ -25,7 +25,6 @@ namespace MissionStuff.ivsdk
         private static float pDist;
         private static Vector3 teleportCoords;
         private static float teleportHdng;
-        private static GameKey tripSkipKey;
 
         // OtherShit
         private static string missionName;
@@ -36,6 +35,8 @@ namespace MissionStuff.ivsdk
         private static bool printHelp;
         private static uint fTimer;
         private static int pVehicle;
+        private static float plyrSpeed;
+        private static float carSpeed;
 
         public static readonly List<string> MissionList = new List<string>();
         public static readonly List<string> ModelList = new List<string>();
@@ -57,7 +58,6 @@ namespace MissionStuff.ivsdk
             debug = settings.GetBoolean("MAIN", "TripSkipDebug", false);
             chargeMoney = settings.GetBoolean("MAIN", "ChargeMoney", false);
             costMult = settings.GetFloat("MAIN", "CostMultiplier", 0.1f);
-            tripSkipKey = (GameKey)settings.GetInteger("MAIN", "TripSkipKey", 23);
 
             string scoString = settings.GetValue("MAIN", "TripSkipSCOList", "");
             MissionList.Clear();
@@ -175,14 +175,17 @@ namespace MissionStuff.ivsdk
                             {
                                 GET_DISTANCE_BETWEEN_COORDS_3D(Main.PlayerPos.X, Main.PlayerPos.Y, Main.PlayerPos.Z, teleportCoords.X, teleportCoords.Y, teleportCoords.Z, out pDist);
                                 if (!chargeMoney)
-                                    IVText.TheIVText.ReplaceTextOfTextLabel("PLACEHOLDER_1", "Hold the ~g~" + tripSkipKey.ToString() + "~s~ key to trip skip.");
+                                    IVText.TheIVText.ReplaceTextOfTextLabel("PLACEHOLDER_1", "Hold ~INPUT_PICKUP~ when stopped to trip skip.");
                                 else
-                                    IVText.TheIVText.ReplaceTextOfTextLabel("PLACEHOLDER_1", "Hold the ~g~" + tripSkipKey.ToString() + "~s~ key to trip skip. It will cost $" + ((int)(pDist * costMult)).ToString());
+                                    IVText.TheIVText.ReplaceTextOfTextLabel("PLACEHOLDER_1", "Hold ~INPUT_PICKUP~ when stopped to trip skip. It will cost $" + ((int)(pDist * costMult)).ToString());
                                 PRINT_HELP("PLACEHOLDER_1");
                                 printHelp = true;
                             }
                             STORE_SCORE(Main.PlayerIndex, out uint pMoney);
-                            if (NativeControls.IsGameKeyPressed(0, tripSkipKey))
+                            GET_CHAR_SPEED(Main.PlayerHandle, out plyrSpeed);
+                            if (IS_CHAR_SITTING_IN_ANY_CAR(Main.PlayerHandle))
+                                GET_CAR_SPEED(pVehicle, out carSpeed);
+                            if (NativeControls.IsGameKeyPressed(0, GameKey.Action) && plyrSpeed < 0.1f && carSpeed < 0.1f)
                             {
                                 if (Main.gTimer >= fTimer + 2000)
                                 {

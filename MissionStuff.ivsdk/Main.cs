@@ -30,6 +30,11 @@ namespace MissionStuff.ivsdk
         public static bool missionLockEnable;
         public static bool betterRaceEnable;
         public static bool pillsEnable;
+        public static bool gangsEnable;
+        public static bool nikoSorrowEnable;
+        public static bool romanRevenueEnable;
+        public static bool costlyDeathEnable;
+        public static bool removeWeapEnable;
 
         // MissionShit
         public static bool timedToBlowEnable;
@@ -39,6 +44,7 @@ namespace MissionStuff.ivsdk
 
         // SettingsFileShit
         public static SettingsFile mainSettings;
+        public static SettingsFile bribeSettings;
 
         // OtherShit
         public static bool dontCrash = false;
@@ -93,6 +99,8 @@ namespace MissionStuff.ivsdk
         {
             mainSettings = new SettingsFile(string.Format("{0}\\IVSDKDotNet\\scripts\\MissionStuff.ini", IVGame.GameStartupPath));
             mainSettings.Load();
+            bribeSettings = new SettingsFile(string.Format("{0}\\IVSDKDotNet\\scripts\\MissionStuff\\BribeSettings.ini", IVGame.GameStartupPath));
+            bribeSettings.Load();
             Init(Settings);
             if (tripSkipEnable)
                 TripSkip.Init(Settings);
@@ -114,6 +122,16 @@ namespace MissionStuff.ivsdk
                 BetterRaceAI.Init(Settings);
             if (pillsEnable)
                 Pills.Init(Settings);
+            if (gangsEnable)
+                GangRelationships.Init(Settings);
+            if (nikoSorrowEnable)
+                BrokeAndOnTheRun.Init(Settings);
+            if (romanRevenueEnable)
+                GiveYouSharesNB.Init(Settings);
+            if (costlyDeathEnable)
+                DeathAndTaxes.Init(Settings);
+            if (removeWeapEnable)
+                VCSBuyBackWeapons.Init(Settings);
 
             if (timedToBlowEnable)
                 TimedToBlow.Init(Settings);
@@ -140,6 +158,11 @@ namespace MissionStuff.ivsdk
             missionLockEnable = settings.GetBoolean("MAIN", "MissionLocks", false);
             betterRaceEnable = settings.GetBoolean("MAIN", "BetterRaceAI", false);
             pillsEnable = settings.GetBoolean("MAIN", "PackiePills", false);
+            gangsEnable = settings.GetBoolean("MAIN", "GangsHateNiko", false);
+            nikoSorrowEnable = settings.GetBoolean("MAIN", "NikosSorrow", false);
+            romanRevenueEnable = settings.GetBoolean("MAIN", "BellicEntShares", false);
+            costlyDeathEnable = settings.GetBoolean("MAIN", "DeadAndBroke", false);
+            removeWeapEnable = settings.GetBoolean("MAIN", "RemoveWeaponsOnDeath", false);
 
             timedToBlowEnable = settings.GetBoolean("MAIN", "TimedToBlow", false);
             heartTimeEnable = settings.GetBoolean("MAIN", "Pacemaker", false);
@@ -182,7 +205,16 @@ namespace MissionStuff.ivsdk
                 BetterRaceAI.Tick();
             if (pillsEnable)
                 Pills.Tick();
-
+            if (gangsEnable)
+                GangRelationships.Tick();
+            if (nikoSorrowEnable)
+                BrokeAndOnTheRun.Tick();
+            if (romanRevenueEnable)
+                GiveYouSharesNB.Tick();
+            if (costlyDeathEnable)
+                DeathAndTaxes.Tick();
+            if (removeWeapEnable)
+                VCSBuyBackWeapons.Tick();
             //SET_CHAR_PROOFS(Main.PlayerHandle, false, false, false, false, false);
 
             if (timedToBlowEnable)

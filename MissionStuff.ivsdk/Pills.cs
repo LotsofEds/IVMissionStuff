@@ -18,7 +18,7 @@ namespace MissionStuff.ivsdk
     internal class Pills
     {
         // IniShit
-        private static int packieStat;
+        private static float packieStat;
         private static Keys antiDepressKey;
         private static Keys adrenalineKey;
         private static Keys painKillerKey;
@@ -128,6 +128,7 @@ namespace MissionStuff.ivsdk
         }
         public static void UnInit()
         {
+            REMOVE_BLIP(pillBlip);
             DELETE_OBJECT(ref objHandle);
             CLEAR_TIMECYCLE_MODIFIER();
             SET_TIME_SCALE(1.0f);
@@ -136,7 +137,7 @@ namespace MissionStuff.ivsdk
 
         public static void Init (SettingsFile settings)
         {
-            packieStat = settings.GetInteger("MAIN", "PackieLikeRequirement", 80);
+            packieStat = settings.GetFloat("MAIN", "PackieLikeRequirement", 80);
             antiDepressKey = settings.GetKey("MAIN", "AntiDepressantKey", Keys.J);
             adrenalineKey = settings.GetKey("MAIN", "AdrenalineKey", Keys.K);
             painKillerKey = settings.GetKey("MAIN", "PainkillerKey", Keys.L);

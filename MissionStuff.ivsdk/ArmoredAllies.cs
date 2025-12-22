@@ -80,7 +80,7 @@ namespace MissionStuff.ivsdk
                             continue;
                         if (pedHandle == Main.PlayerHandle)
                             continue;
-                        if (HAS_CHAR_BEEN_DAMAGED_BY_WEAPON(pedHandle, 57))
+                        if (IS_CHAR_INJURED(pedHandle))
                             continue;
                         if (PedList.Contains(pedHandle))
                             continue;

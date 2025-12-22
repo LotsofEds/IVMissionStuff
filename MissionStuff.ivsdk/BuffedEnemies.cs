@@ -84,6 +84,8 @@ namespace MissionStuff.ivsdk
                             continue;
                         if (pedHandle == Main.PlayerHandle)
                             continue;
+                        if (IS_CHAR_INJURED(pedHandle))
+                            continue;
                         if (PedList.Contains(pedHandle))
                             continue;
 
