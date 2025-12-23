@@ -34,7 +34,7 @@ namespace MissionStuff.ivsdk
         }
         public static void Tick()
         {
-            if (NativeGame.IsScriptRunning("roman5"))
+            if (NativeGame.IsScriptRunning("roman11"))
             {
                 if (!loseMoney && IS_THIS_PRINT_BEING_DISPLAYED("R11003", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
                 {
@@ -45,6 +45,8 @@ namespace MissionStuff.ivsdk
                         ADD_SCORE(Main.PlayerIndex, - moneyLost);
                 }
             }
+            else if (loseMoney)
+                loseMoney = false;
         }
     }
 }

@@ -125,7 +125,6 @@ namespace MissionStuff.ivsdk
                         //IVGame.ShowSubtitleMessage(warnMessage, 4000);
                         hasWarned = true;
                     }
-                    //SET_PLAYER_INVISIBLE_TO_AI
                 }
             }
             else if (startTime)

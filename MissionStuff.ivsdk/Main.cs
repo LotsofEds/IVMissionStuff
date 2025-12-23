@@ -215,6 +215,7 @@ namespace MissionStuff.ivsdk
                 DeathAndTaxes.Tick();
             if (removeWeapEnable)
                 VCSBuyBackWeapons.Tick();
+
             //SET_CHAR_PROOFS(Main.PlayerHandle, false, false, false, false, false);
 
             if (timedToBlowEnable)
