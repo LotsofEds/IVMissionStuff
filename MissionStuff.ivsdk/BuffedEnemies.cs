@@ -95,8 +95,21 @@ namespace MissionStuff.ivsdk
                             if (pModel == GET_HASH_KEY(pedModel))
                                 continue;
 
-                            PedList.Add(pedHandle);
+                            if (!PedList.Contains(pedHandle))
+                            {
+                                PedList.Add(pedHandle);
 
+                                GET_CHAR_HEALTH(pedHandle, out uint pHealth);
+                                SET_CHAR_MAX_HEALTH(pedHandle, (uint)(pHealth + healthIncrease));
+                                SET_CHAR_HEALTH(pedHandle, (uint)(pHealth + healthIncrease));
+
+                                if (giveArmor)
+                                {
+                                    GET_CHAR_ARMOUR(pedHandle, out uint pedArmor);
+                                    if (pedArmor < 100)
+                                        ADD_ARMOUR_TO_CHAR(pedHandle, 100);
+                                }
+                            }
                         }
                     }
 
@@ -124,19 +137,12 @@ namespace MissionStuff.ivsdk
                             }
                         }
 
-                        if (HAS_CHAR_BEEN_DAMAGED_BY_WEAPON(ped, 57))
+                        /*if (HAS_CHAR_BEEN_DAMAGED_BY_WEAPON(ped, 57))
                             continue;
 
                         GET_CHAR_HEALTH(ped, out uint pHealth);
                         SET_CHAR_MAX_HEALTH(ped, (uint)(pHealth + healthIncrease));
-                        SET_CHAR_HEALTH(ped, (uint)(pHealth + healthIncrease));
-
-                        if (giveArmor)
-                        {
-                            GET_CHAR_ARMOUR(ped, out uint pedArmor);
-                            if (pedArmor < 100)
-                                ADD_ARMOUR_TO_CHAR(ped, 100);
-                        }
+                        SET_CHAR_HEALTH(ped, (uint)(pHealth + healthIncrease));*/
                     }
                 }
                 else if (missionName == MissionSCO)

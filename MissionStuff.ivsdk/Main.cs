@@ -62,6 +62,10 @@ namespace MissionStuff.ivsdk
         {
             if (tripSkipEnable)
                 TripSkip.GameLoad();
+            if (romanRevenueEnable)
+                GiveYouSharesNB.GameLoad();
+            if (costlyDeathEnable)
+                DeathAndTaxes.GameLoad();
         }
         private void Main_Uninitialize(object sender, EventArgs e)
         {

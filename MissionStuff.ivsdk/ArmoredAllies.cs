@@ -49,6 +49,7 @@ namespace MissionStuff.ivsdk
             foreach (var HealthValue in HealthString.Split(','))
             {
                 int HealthAmount = Int32.Parse(HealthValue.Trim());
+                HealthList.Add(HealthAmount);
             }
 
             string WeapString = settings.GetValue(scoName, "AllyWeaponReplacement", "");
@@ -60,7 +61,7 @@ namespace MissionStuff.ivsdk
                 WeaponList.Add(WeaponID);
             }
 
-            giveArmor = settings.GetBoolean(scoName, "EnemiesHaveArmor", false);
+            giveArmor = settings.GetBoolean(scoName, "AlliesHaveArmor", false);
         }
         public static void Tick()
         {
@@ -90,15 +91,35 @@ namespace MissionStuff.ivsdk
                             GET_CHAR_MODEL(pedHandle, out int pModel);
 
                             if (pModel == GET_HASH_KEY(pedModel))
+                            {
                                 PedList.Add(pedHandle);
+
+                                if (HealthList[ModelList.IndexOf(pedModel)] > 0)
+                                {
+                                    GET_CHAR_HEALTH(pedHandle, out uint pHealth);
+                                    SET_CHAR_MAX_HEALTH(pedHandle, (uint)(pHealth + HealthList[ModelList.IndexOf(pedModel)]));
+                                    SET_CHAR_HEALTH(pedHandle, (uint)(pHealth + HealthList[ModelList.IndexOf(pedModel)]));
+                                }
+
+                                if (giveArmor)
+                                {
+                                    GET_CHAR_ARMOUR(pedHandle, out uint pedArmor);
+                                    if (pedArmor < 100)
+                                        ADD_ARMOUR_TO_CHAR(pedHandle, 100);
+                                }
+                            }
                         }
                     }
 
                     foreach (var ped in PedList)
                     {
+                        /*if (!DOES_CHAR_EXIST(ped))
+                            PedList.Remove(ped);
+                        if (ModelList.Count() != PedList.Count)*/
                         if (!DOES_CHAR_EXIST(ped))
                             continue;
 
+                        //IVGame.ShowSubtitleMessage(PedList.Count() + "  " + ModelList.Count() + "  " + HealthList.Count() + "  " + WeaponList.Count());
                         GET_CURRENT_CHAR_WEAPON(ped, out int pedWeap);
                         GET_CHAR_MODEL(ped, out int pModel);
 
@@ -108,8 +129,8 @@ namespace MissionStuff.ivsdk
                             {
                                 if (pedWeap != WeaponList[ModelList.IndexOf(pedModel)] && WeaponList[ModelList.IndexOf(pedModel)] > -1)
                                     GIVE_WEAPON_TO_CHAR(ped, WeaponList[ModelList.IndexOf(pedModel)], 9999, false);
-                                
-                                if (HAS_CHAR_BEEN_DAMAGED_BY_WEAPON(ped, 57))
+
+                                /*if (HAS_CHAR_BEEN_DAMAGED_BY_WEAPON(ped, 57))
                                     continue;
 
                                 if (HealthList[ModelList.IndexOf(pedModel)] > 0)
@@ -117,15 +138,8 @@ namespace MissionStuff.ivsdk
                                     GET_CHAR_HEALTH(ped, out uint pHealth);
                                     SET_CHAR_MAX_HEALTH(ped, (uint)(pHealth + HealthList[ModelList.IndexOf(pedModel)]));
                                     SET_CHAR_HEALTH(ped, (uint)(pHealth + HealthList[ModelList.IndexOf(pedModel)]));
-                                }
+                                }*/
                             }
-                        }
-
-                        if (giveArmor)
-                        {
-                            GET_CHAR_ARMOUR(ped, out uint pedArmor);
-                            if (pedArmor < 100)
-                                ADD_ARMOUR_TO_CHAR(ped, 100);
                         }
                     }
                 }

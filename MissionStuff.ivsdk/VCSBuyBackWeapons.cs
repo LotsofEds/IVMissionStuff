@@ -149,7 +149,6 @@ namespace MissionStuff.ivsdk
                 $"~n~Press ~INPUT_PICKUP~ to pay.";
             }
 
-
             IVText.TheIVText.ReplaceTextOfTextLabel("PLACEHOLDER_1", message);
             PRINT_HELP("PLACEHOLDER_1");
         }

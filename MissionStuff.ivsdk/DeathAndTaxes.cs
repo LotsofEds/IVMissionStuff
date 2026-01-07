@@ -28,10 +28,12 @@ namespace MissionStuff.ivsdk
         private static int minPlayerHeath;
 
         // OtherShit
+        private static int timesDied;
         private static bool hasDied;
         private static uint pMoney;
         private static int pMaxHealth;
         private static int pHealth;
+        private static uint currHealth;
         private static uint fTimer;
         public static void Init(SettingsFile settings)
         {
@@ -41,6 +43,11 @@ namespace MissionStuff.ivsdk
             healthReduction = settings.GetInteger("MAIN", "HealthReductionPerDeath", 10);
             reductionTime = settings.GetInteger("MAIN", "HealthReductionTime", 720000);
             minPlayerHeath = settings.GetInteger("MAIN", "MinPlayerHealth", 20);
+        }
+        public static void GameLoad()
+        {
+            timesDied = 0;
+            pHealth = 200;
         }
         public static void Tick()
         {
@@ -52,20 +59,35 @@ namespace MissionStuff.ivsdk
             else if (hasDied && IS_SCREEN_FADING_IN() && !IS_CHAR_DEAD(Main.PlayerHandle))
             {
                 STORE_SCORE(Main.PlayerIndex, out uint currMoney);
-                if (currMoney < billAmount)
+                if (currMoney < billAmount && reduceHealth)
                 {
+                    GET_GAME_TIMER(out fTimer);
+                    timesDied++;
                     GET_PLAYER_MAX_HEALTH(Main.PlayerIndex, out pMaxHealth);
-                    if ((pMaxHealth - healthReduction) > minPlayerHeath)
-                        INCREASE_PLAYER_MAX_HEALTH(Main.PlayerIndex, (- healthReduction));
-                    pHealth = (pMaxHealth - healthReduction);
+                    pHealth = (pMaxHealth - healthReduction * timesDied);
                 }
                 ADD_SCORE(Main.PlayerIndex, (int)(-currMoney));
                 ADD_SCORE(Main.PlayerIndex, (int)pMoney);
                 ADD_SCORE(Main.PlayerIndex, -10000);
                 hasDied = false;
             }
-            if (!IS_CHAR_DEAD(Main.PlayerHandle) && pHealth < pMaxHealth)
-                INCREASE_PLAYER_MAX_HEALTH(Main.PlayerIndex, (-healthReduction));
+            if (!IS_CHAR_DEAD(Main.PlayerHandle) && reduceHealth && pHealth < pMaxHealth)
+            {
+                GET_CHAR_HEALTH(Main.PlayerHandle, out currHealth);
+                if (currHealth > pHealth)
+                {
+                    if (pHealth > minPlayerHeath)
+                        INCREASE_PLAYER_MAX_HEALTH(Main.PlayerIndex, (-healthReduction * timesDied));
+                    else
+                        INCREASE_PLAYER_MAX_HEALTH(Main.PlayerIndex, (minPlayerHeath - 100));
+                }
+
+                if (Main.gTimer > fTimer + reductionTime)
+                {
+                    GET_GAME_TIMER(out fTimer);
+                    timesDied--;
+                }
+            }
         }
     }
 }

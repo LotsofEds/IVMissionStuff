@@ -51,6 +51,7 @@ namespace MissionStuff.ivsdk
         private static int pillCost;
         private static int pillIndex;
         private static string pillName;
+        private static string pillDesc;
         private static int pillBlip;
         private static int pillCount;
         private static int aPillCount;
@@ -228,24 +229,34 @@ namespace MissionStuff.ivsdk
                             pillName = "Adrenaline pills";
                             pillCost = adrenalineCost;
                             pillCount = aPillCount;
+                            pillDesc = "~s~Slows down time and increases movement speed for a short period of time.";
                         }
                         else if (pillIndex == 1)
                         {
                             pillName = "Painkillers";
                             pillCost = painkillerCost;
                             pillCount = pPillCount;
+                            pillDesc = "~s~Reduces damage taken by half for a short period of time.";
                         }
                         else if (pillIndex == 2)
                         {
                             pillName = "Anti-depressants";
                             pillCost = antiDepressCost;
                             pillCount = dPillCount;
+                            pillDesc = "~s~Replenishes a small amount of health immediately.";
                         }
                         if (!IS_THIS_HELP_MESSAGE_BEING_DISPLAYED("PLACEHOLDERSL"))
                             IVText.TheIVText.ReplaceTextOfTextLabel("PLACEHOLDER_1", "~s~Use ~PAD_LEFT~ and ~PAD_RIGHT~ to browse pills. ~n~~s~Press ~INPUT_PICKUP~ to cancel. ~n~~s~Press ~INPUT_FRONTEND_ACCEPT~ to buy. ~n~~g~" + pillName + " $" + pillCost.ToString() + " ~n~~s~Currently have " + pillCount.ToString());
 
                         if (!IS_THIS_HELP_MESSAGE_BEING_DISPLAYED("PLACEHOLDER_1") && !IS_THIS_HELP_MESSAGE_BEING_DISPLAYED("PLACEHOLDERSL"))
                             PRINT_HELP_FOREVER("PLACEHOLDER_1");
+
+                        // Description
+                        /*if (!IS_THIS_PRINT_BEING_DISPLAYED("TM_1_2", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+                        {
+                            IVText.TheIVText.ReplaceTextOfTextLabel("TM_1_2", pillDesc);
+                            IVGame.ShowSubtitleMessage("TM_1_2");
+                        }*/
 
                         if (IS_CONTROL_JUST_PRESSED(0, (int)GameKey.NavEnter) || IS_CONTROL_JUST_PRESSED(2, (int)GameKey.NavEnter))
                         {

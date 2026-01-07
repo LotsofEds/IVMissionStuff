@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
+using System.Runtime;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,14 +40,22 @@ namespace MissionStuff.ivsdk
             revenueGiven = settings.GetInteger("MAIN", "BERevenueGiven", 200);
             maxRevenue = settings.GetInteger("MAIN", "BEMaxRevenue", 1000);
         }
+        public static void GameLoad()
+        {
+            getDay = false;
+        }
         public static void Tick()
         {
             if (!getDay)
             {
+                if (!Main.mainSettings.DoesKeyExists(IVGenericGameStorage.ValidSaveName, "CurrentBalance"))
+                    Main.mainSettings.AddKeyToSection(IVGenericGameStorage.ValidSaveName, "CurrentBalance");
+
+                currentBal = Main.mainSettings.GetInteger(IVGenericGameStorage.ValidSaveName, "CurrentBalance", 0);
                 daysPassed = GET_INT_STAT(260);
                 getDay = true;
             }
-            if (daysPassed != GET_INT_STAT(260))
+            else if (daysPassed != GET_INT_STAT(260))
             {
                 daysPassed = GET_INT_STAT(260);
 
@@ -72,8 +81,7 @@ namespace MissionStuff.ivsdk
                         IVGame.ShowSubtitleMessage("ATM On");
                     if (currentBal > 0)
                     {
-                        STORE_SCORE(Main.PlayerIndex, out uint pMoney);
-                        ADD_SCORE(Main.PlayerIndex, (currentBal + (int)pMoney));
+                        ADD_SCORE(Main.PlayerIndex, currentBal);
                         currentBal = 0;
                     }
                 }
