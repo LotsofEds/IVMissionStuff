@@ -31,6 +31,7 @@ namespace MissionStuff.ivsdk
         private static bool switchSeats;
         private static bool startChase;
         private static bool triggerCutscene;
+        private static bool warnPlayer;
         private static bool endCutscene;
 
         // ArrayShit
@@ -61,7 +62,6 @@ namespace MissionStuff.ivsdk
         private static uint fTimer;
         public static void UnInit()
         {
-            SET_MAX_WANTED_LEVEL(6);
             for (int i = 0; i < 16; i++)
             {
                 DELETE_CAR(ref enemyVehicles[i]);
@@ -93,6 +93,7 @@ namespace MissionStuff.ivsdk
             switchSeats = false;
             startChase = false;
             triggerCutscene = false;
+            warnPlayer = false;
             endCutscene = false;
         }
         public static void Init(SettingsFile settings)
@@ -135,24 +136,29 @@ namespace MissionStuff.ivsdk
                 //SET_CAM_PROPAGATE(cam2, true);
                 CREATE_CAM(3, out interpCam);
 
+                /*SET_CHAR_WILL_DO_DRIVEBYS(Main.PlayerHandle, true);
+                SET_AMMO_IN_CLIP(Main.PlayerHandle, plyrWeapon, 20);
+                if (!IS_CHAR_INJURED(shooterPeds[13]))
+                    _TASK_SHOOT_AT_CHAR(Main.PlayerHandle, shooterPeds[13], 4000, (int)eShootMode.SHOOT_MODE_CONTINUOUS);
+                //_TASK_DRIVE_BY(Main.PlayerHandle, shooterPeds[13], 1, 0, 0, 0, 540, 8, true, 45000);
+                //_TASK_COMBAT(Main.PlayerHandle, shooterPeds[13]);
+                else if (!IS_CHAR_INJURED(shooterPeds[14]))
+                    _TASK_SHOOT_AT_CHAR(Main.PlayerHandle, shooterPeds[14], 4000, (int)eShootMode.SHOOT_MODE_CONTINUOUS);
+                //_TASK_DRIVE_BY(Main.PlayerHandle, shooterPeds[14], 1, 0, 0, 0, 540, 8, true, 45000);
+                //_TASK_COMBAT(Main.PlayerHandle, shooterPeds[14]);
+                else if (!IS_CHAR_INJURED(driverPeds[13]) && !IS_PED_IN_COMBAT(Main.PlayerHandle))
+                    _TASK_SHOOT_AT_CHAR(Main.PlayerHandle, driverPeds[13], 4000, (int)eShootMode.SHOOT_MODE_CONTINUOUS);
+                //_TASK_DRIVE_BY(Main.PlayerHandle, driverPeds[13], 1, 0, 0, 0, 540, 8, true, 45000);
+                //_TASK_COMBAT(Main.PlayerHandle, driverPeds[13]);
+                else if (!IS_CHAR_INJURED(driverPeds[14]) && !IS_PED_IN_COMBAT(Main.PlayerHandle))
+                    _TASK_SHOOT_AT_CHAR(Main.PlayerHandle, driverPeds[14], 4000, (int)eShootMode.SHOOT_MODE_CONTINUOUS);
+                //_TASK_DRIVE_BY(Main.PlayerHandle, driverPeds[14], 1, 0, 0, 0, 540, 8, true, 45000);
+                //_TASK_COMBAT(Main.PlayerHandle, driverPeds[14]);*/
+
                 GET_GAME_TIMER(out fTimer);
             }
             else
             {
-                SET_CHAR_WILL_DO_DRIVEBYS(Main.PlayerHandle, true);
-                if (!IS_CHAR_INJURED(shooterPeds[13]))
-                _TASK_DRIVE_BY(Main.PlayerHandle, shooterPeds[13], 1, 0, 0, 0, 540, 8, true, 45000);
-                //_TASK_COMBAT(Main.PlayerHandle, shooterPeds[13]);
-                else if (!IS_CHAR_INJURED(shooterPeds[14]))
-                    _TASK_DRIVE_BY(Main.PlayerHandle, shooterPeds[14], 1, 0, 0, 0, 540, 8, true, 45000);
-                //_TASK_COMBAT(Main.PlayerHandle, shooterPeds[14]);
-                else if (!IS_CHAR_INJURED(driverPeds[13]))
-                    _TASK_DRIVE_BY(Main.PlayerHandle, driverPeds[13], 1, 0, 0, 0, 540, 8, true, 45000);
-                //_TASK_COMBAT(Main.PlayerHandle, driverPeds[13]);
-                else if (!IS_CHAR_INJURED(driverPeds[14]))
-                    _TASK_DRIVE_BY(Main.PlayerHandle, driverPeds[14], 1, 0, 0, 0, 540, 8, true, 45000);
-                //_TASK_COMBAT(Main.PlayerHandle, driverPeds[14]);
-
                 if (Main.gTimer >= fTimer + 4000 && !endCutscene)
                 {
                     for (int i = 0; i < 16; i++)
@@ -204,19 +210,22 @@ namespace MissionStuff.ivsdk
         }
         public static void ProcessChase()
         {
-            SET_MAX_WANTED_LEVEL(0);
+            ALTER_WANTED_LEVEL(Main.PlayerIndex, 0);
+            APPLY_WANTED_LEVEL_CHANGE_NOW(Main.PlayerIndex);
+
             GET_SCRIPT_TASK_STATUS(berniePed, 15, out taskStatus);
             //IVGame.ShowSubtitleMessage(bernieCheckPoint.ToString());
 
-            if (GET_ENGINE_HEALTH(pVeh) < 200 || GET_PETROL_TANK_HEALTH(pVeh) < 200)
+            IVVehicle ass = IVVehicle.FromUIntPtr(Main.PlayerPed.GetVehicle());
+            if (!warnPlayer && (GET_ENGINE_HEALTH(pVeh) < 200 || ass.PetrolTankHealth < 200))
             {
+                //IVGame.ShowSubtitleMessage(GET_ENGINE_HEALTH(pVeh).ToString() + "  " + GET_PETROL_TANK_HEALTH(pVeh).ToString());
+                warnPlayer = true;
                 IVText.TheIVText.ReplaceTextOfTextLabel("PLACEHOLDERSL", warnMessage);
                 PRINT_HELP("PLACEHOLDERSL");
             }
             if (IS_THIS_PRINT_BEING_DISPLAYED("BER3_GOD2", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
                 IVGame.ShowSubtitleMessage(newMessage, 5000);
-            if (IS_THIS_PRINT_BEING_DISPLAYED("BER3_GOD3b", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
-                IVGame.ShowSubtitleMessage("~s~Follow ~r~Dimitri's men~s~ and get rid of them.", 5000);
 
             for (int i = 0; i < 16; i++)
             {
@@ -682,7 +691,10 @@ namespace MissionStuff.ivsdk
                 else if (endCutscene && Main.gTimer >= fTimer + 12000)
                     DESTROY_ALL_CAMS();
 
-                else if (LOCATE_CHAR_IN_CAR_3D(Main.PlayerHandle, 1129.244f, -883.3863f, 1.5f, 2.5f, 2.5f, 2.5f, false))
+                if (IS_THIS_PRINT_BEING_DISPLAYED("BER3_GOD3b", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+                    IVGame.ShowSubtitleMessage("~s~Follow ~r~Dimitri's men~s~ and get rid of them.", 5000);
+
+                else if (LOCATE_CHAR_IN_CAR_3D(Main.PlayerHandle, 1129.244f, -883.3863f, 3.5f, 4.0f, 4.0f, 4.0f, false))
                 {
                     if (!HAS_MODEL_LOADED(GET_HASH_KEY("squalo")))
                         REQUEST_MODEL(GET_HASH_KEY("squalo"));
@@ -744,7 +756,6 @@ namespace MissionStuff.ivsdk
                             //CREATE_CAR(GET_HASH_KEY("squalo"), 1208.035f, -938.572f, 0, out enemyVehicles[1], true);
 
                             bernieCheckPoint = -1;
-                            SET_MAX_WANTED_LEVEL(0);
 
                             startChase = true;
                         }
@@ -759,7 +770,6 @@ namespace MissionStuff.ivsdk
             }
             else if (startChase)
             {
-                SET_MAX_WANTED_LEVEL(6);
                 for (int i = 0; i < 16; i++)
                 {
                     DELETE_CAR(ref enemyVehicles[i]);
@@ -792,6 +802,7 @@ namespace MissionStuff.ivsdk
                 switchSeats = false;
                 startChase = false;
                 triggerCutscene = false;
+                warnPlayer = false;
                 endCutscene = false;
             }
         }

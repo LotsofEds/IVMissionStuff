@@ -21,6 +21,7 @@ namespace MissionStuff.ivsdk
     {
         // IniShit
         private static bool buyBackWeapons;
+        private static int bribeDuration;
 
         // WeaponShit
         private static List<int> inventory = new List<int>();
@@ -29,11 +30,24 @@ namespace MissionStuff.ivsdk
 
         // OtherShit
         private static bool hasDied;
-        private static bool messageShown;
+        private static bool canBribe;
+        private static int bribeBlip;
+        private static Vector3 bribeLoc;
         private static uint fTimer;
         public static void Init(SettingsFile settings)
         {
             buyBackWeapons = settings.GetBoolean("MAIN", "BuyBackWeapons", false);
+            bribeDuration = settings.GetInteger("MAIN", "BribeDuration", 360000);
+        }
+        public static void UnInit()
+        {
+            hasDied = false;
+            REMOVE_BLIP(bribeBlip);
+        }
+        public static void GameLoad()
+        {
+            fTimer = 0;
+            REMOVE_BLIP(bribeBlip);
         }
         public static void Tick()
         {
@@ -47,15 +61,40 @@ namespace MissionStuff.ivsdk
                 if (buyBackWeapons)
                     hasDied = true;
             }
-            else if (hasDied && IS_SCREEN_FADED_IN() && !IS_CHAR_DEAD(Main.PlayerHandle))
+            else if (hasDied && IS_SCREEN_FADING_IN() && !IS_CHAR_DEAD(Main.PlayerHandle))
             {
-                messageShown = false;
-                ShowBribeNotification();
+                canBribe = false;
+                bribeLoc = Main.PlayerPos;
+                ShowBribeLocation();
+                if (!DOES_BLIP_EXIST(bribeBlip))
+                {
+                    // 1371.646, 621.487, 35.829
+                    ADD_BLIP_FOR_COORD(bribeLoc.X, bribeLoc.Y, bribeLoc.Z, out bribeBlip);
+
+                    NativeBlip pBlip = new NativeBlip(bribeBlip);
+
+                    pBlip.Icon = BlipIcon.Building_Hospital;
+                    pBlip.Name = "Weapon Bribe";
+                    pBlip.Display = eBlipDisplay.BLIP_DISPLAY_ARROW_AND_MAP;
+                    pBlip.ShowOnlyWhenNear = true;
+                }
+                GET_GAME_TIMER(out fTimer);
+                //IVGame.ShowSubtitleMessage(Main.PlayerPos.ToString());
                 hasDied = false;
             }
-            if (messageShown && NativeControls.IsGameKeyPressed(0, GameKey.Action) && IS_THIS_HELP_MESSAGE_BEING_DISPLAYED("PLACEHOLDER_1"))
+            if (canBribe && IS_SCREEN_FADED_IN())
             {
-                RestoreWeapons();
+                if (LOCATE_CHAR_ON_FOOT_3D(Main.PlayerHandle, bribeLoc.X, bribeLoc.Y, bribeLoc.Z, 1.0f, 1.0f, 1.0f, true))
+                {
+                    ShowBribeLocation();
+                    if (NativeControls.IsGameKeyPressed(0, GameKey.Action))
+                        RestoreWeapons();
+                }
+                if (Main.gTimer > fTimer + bribeDuration)
+                {
+                    REMOVE_BLIP(bribeBlip);
+                    canBribe = false;
+                }
             }
         }
         public static List<int> GetWeaponInventory(bool IncludeMelee)
@@ -91,13 +130,22 @@ namespace MissionStuff.ivsdk
             return ammoCounts;
         }
 
-        private static void ShowBribeNotification()
+        private static void ShowBribeLocation()
         {
-            if (!IS_HELP_MESSAGE_BEING_DISPLAYED() && !messageShown)
+            if (!canBribe)
             {
                 BribeForWeaponsNotification(inventory);
-                messageShown = true;
+                canBribe = true;
             }
+            else
+                DISPLAY_HELP_TEXT_THIS_FRAME("PLACEHOLDER_1", false);
+            //canBribe = true;
+
+            /*if (!IS_HELP_MESSAGE_BEING_DISPLAYED() && !canBribe)
+            {
+                BribeForWeaponsNotification(inventory);
+                canBribe = true;
+            }*/
         }
 
         private static void RestoreWeapons()
@@ -117,10 +165,11 @@ namespace MissionStuff.ivsdk
             fullPrice = 0;
 
             if (IS_THIS_HELP_MESSAGE_BEING_DISPLAYED("PLACEHOLDER_1"))
-            {
                 CLEAR_HELP();
-                messageShown = false;
-            }
+
+            REMOVE_BLIP(bribeBlip);
+
+            canBribe = false;
         }
         private static int GetWeaponBribePrice(int weapon)
         {
@@ -150,7 +199,8 @@ namespace MissionStuff.ivsdk
             }
 
             IVText.TheIVText.ReplaceTextOfTextLabel("PLACEHOLDER_1", message);
-            PRINT_HELP("PLACEHOLDER_1");
+            //DISPLAY_HELP_TEXT_THIS_FRAME("PLACEHOLDER_1", false);
+            //PRINT_HELP("PLACEHOLDER_1");
         }
         private static void CalculateBribePrice(List<int> inventory)
         {

@@ -45,6 +45,7 @@ namespace MissionStuff.ivsdk
         private static bool adrenalineActive;
         private static bool painKillerActive;
         private static bool gotHealth;
+        private static bool gotPillCount;
 
         // OtherShit
         private static int time;
@@ -135,6 +136,12 @@ namespace MissionStuff.ivsdk
             SET_TIME_SCALE(1.0f);
             SET_CHAR_MOVE_ANIM_SPEED_MULTIPLIER(Main.PlayerHandle, 1f);
         }
+        public static void GameLoad()
+        {
+            gotPillCount = false;
+            fTimer = 0;
+            REMOVE_BLIP(pillBlip);
+        }
 
         public static void Init (SettingsFile settings)
         {
@@ -180,7 +187,10 @@ namespace MissionStuff.ivsdk
                 if (GET_FLOAT_STAT(20) >= packieStat)
                     canBuyPills = true;
                 else
+                {
+                    REMOVE_BLIP(pillBlip);
                     canBuyPills = false;
+                }
             }
             //canBuyPills = true;
             if (canBuyPills)
@@ -192,9 +202,11 @@ namespace MissionStuff.ivsdk
 
                     NativeBlip pBlip = new NativeBlip(pillBlip);
 
-                    pBlip.Icon = BlipIcon.Building_Hospital;
+                    pBlip.Icon = BlipIcon.Pickup_Health;
                     pBlip.Name = "Pills";
                     pBlip.Display = eBlipDisplay.BLIP_DISPLAY_ARROW_AND_MAP;
+                    pBlip.Scale = 0.5f;
+                    pBlip.ShowOnlyWhenNear = true;
                 }
 
                 if (LOCATE_CHAR_ON_FOOT_3D(Main.PlayerHandle, 1371.646f, 621.487f, 35.829f, 1.0f, 1.0f, 1.0f, true) || inMenu)
@@ -229,34 +241,31 @@ namespace MissionStuff.ivsdk
                             pillName = "Adrenaline pills";
                             pillCost = adrenalineCost;
                             pillCount = aPillCount;
-                            pillDesc = "~s~Slows down time and increases movement speed for a short period of time.";
+                            pillDesc = "~s~Slows down time and increases movement speed for a short period of time. Press K to take.";
                         }
                         else if (pillIndex == 1)
                         {
                             pillName = "Painkillers";
                             pillCost = painkillerCost;
                             pillCount = pPillCount;
-                            pillDesc = "~s~Reduces damage taken by half for a short period of time.";
+                            pillDesc = "~s~Reduces damage taken by half for a short period of time. Press L to take.";
                         }
                         else if (pillIndex == 2)
                         {
                             pillName = "Anti-depressants";
                             pillCost = antiDepressCost;
                             pillCount = dPillCount;
-                            pillDesc = "~s~Replenishes a small amount of health immediately.";
+                            pillDesc = "~s~Replenishes a small amount of health immediately. Press J to take.";
                         }
                         if (!IS_THIS_HELP_MESSAGE_BEING_DISPLAYED("PLACEHOLDERSL"))
                             IVText.TheIVText.ReplaceTextOfTextLabel("PLACEHOLDER_1", "~s~Use ~PAD_LEFT~ and ~PAD_RIGHT~ to browse pills. ~n~~s~Press ~INPUT_PICKUP~ to cancel. ~n~~s~Press ~INPUT_FRONTEND_ACCEPT~ to buy. ~n~~g~" + pillName + " $" + pillCost.ToString() + " ~n~~s~Currently have " + pillCount.ToString());
 
                         if (!IS_THIS_HELP_MESSAGE_BEING_DISPLAYED("PLACEHOLDER_1") && !IS_THIS_HELP_MESSAGE_BEING_DISPLAYED("PLACEHOLDERSL"))
-                            PRINT_HELP_FOREVER("PLACEHOLDER_1");
-
-                        // Description
-                        /*if (!IS_THIS_PRINT_BEING_DISPLAYED("TM_1_2", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
                         {
-                            IVText.TheIVText.ReplaceTextOfTextLabel("TM_1_2", pillDesc);
-                            IVGame.ShowSubtitleMessage("TM_1_2");
-                        }*/
+                            PRINT_HELP_FOREVER("PLACEHOLDER_1");
+                            // Description
+                            IVGame.ShowSubtitleMessage(pillDesc);
+                        }
 
                         if (IS_CONTROL_JUST_PRESSED(0, (int)GameKey.NavEnter) || IS_CONTROL_JUST_PRESSED(2, (int)GameKey.NavEnter))
                         {
@@ -312,6 +321,13 @@ namespace MissionStuff.ivsdk
         }
         public static void Tick()
         {
+            if (!gotPillCount)
+            {
+                aPillCount = Main.mainSettings.GetInteger(IVGenericGameStorage.ValidSaveName, "AdrenalineCount", 0);
+                pPillCount = Main.mainSettings.GetInteger(IVGenericGameStorage.ValidSaveName, "PainkillerCount", 0);
+                dPillCount = Main.mainSettings.GetInteger(IVGenericGameStorage.ValidSaveName, "AntiDepressantCount", 0);
+                gotPillCount = true;
+            }
             ProcessBuying();
 
             if (!HAVE_ANIMS_LOADED("amb@sprunk_plyr"))

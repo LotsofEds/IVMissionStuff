@@ -41,6 +41,7 @@ namespace MissionStuff.ivsdk
         public static bool heartTimeEnable;
         public static bool buoysAhoyEnable;
         public static bool escuelaOfTheSleepEnable;
+        public static bool removeEvidence;
 
         // SettingsFileShit
         public static SettingsFile mainSettings;
@@ -66,6 +67,10 @@ namespace MissionStuff.ivsdk
                 GiveYouSharesNB.GameLoad();
             if (costlyDeathEnable)
                 DeathAndTaxes.GameLoad();
+            if (pillsEnable)
+                Pills.GameLoad();
+            if (removeWeapEnable)
+                VCSBuyBackWeapons.GameLoad();
         }
         private void Main_Uninitialize(object sender, EventArgs e)
         {
@@ -74,6 +79,8 @@ namespace MissionStuff.ivsdk
             BuoysAhoy.UnInit();
             EscuelaOfTheSleep.UnInit();
             Pills.UnInit();
+            VCSBuyBackWeapons.UnInit();
+            NiksteinFiles.UnInit();
         }
 
         private void Main_KeyDown(object sender, KeyEventArgs e)
@@ -145,6 +152,8 @@ namespace MissionStuff.ivsdk
                 BuoysAhoy.Init(Settings);
             if (escuelaOfTheSleepEnable)
                 EscuelaOfTheSleep.Init();
+            if (removeEvidence)
+                NiksteinFiles.Init();
         }
         public static bool InitialChecks()
         {
@@ -172,6 +181,7 @@ namespace MissionStuff.ivsdk
             heartTimeEnable = settings.GetBoolean("MAIN", "Pacemaker", false);
             buoysAhoyEnable = settings.GetBoolean("MAIN", "BuoysAhoyRevamp", false);
             escuelaOfTheSleepEnable = settings.GetBoolean("MAIN", "EscuelaOfTheSleep", false);
+            removeEvidence = settings.GetBoolean("MAIN", "YoureUndercoverAsInDeep", false);
         }
         private void Main_Tick(object sender, EventArgs e)
         {
@@ -230,6 +240,8 @@ namespace MissionStuff.ivsdk
                 BuoysAhoy.Tick();
             if (escuelaOfTheSleepEnable)
                 EscuelaOfTheSleep.Tick();
+            if (removeEvidence)
+                NiksteinFiles.Tick();
         }
     }
 }

@@ -23,7 +23,9 @@ namespace MissionStuff.ivsdk
 
         // OtherShit
         private static string missionName;
+        private static string buffGXT;
         private static bool giveArmor;
+        private static bool giveBuffs;
 
         public static void Init(SettingsFile settings)
         {
@@ -52,7 +54,7 @@ namespace MissionStuff.ivsdk
                 HealthList.Add(HealthAmount);
             }
 
-            string WeapString = settings.GetValue(scoName, "AllyWeaponReplacement", "");
+            string WeapString = settings.GetValue(scoName, "AllyWeaponReplacement", "-1");
 
             WeaponList.Clear();
             foreach (var WeaponValue in WeapString.Split(','))
@@ -62,6 +64,8 @@ namespace MissionStuff.ivsdk
             }
 
             giveArmor = settings.GetBoolean(scoName, "AlliesHaveArmor", false);
+
+            buffGXT = settings.GetValue(scoName, "BuffAlliesGXT", "");
         }
         public static void Tick()
         {
@@ -71,41 +75,48 @@ namespace MissionStuff.ivsdk
                 {
                     if (missionName != MissionSCO)
                     {
+                        giveBuffs = false;
                         missionName = MissionSCO;
                         LoadHealthData(Main.mainSettings, MissionSCO);
                     }
-                    foreach (var ped in PedHelper.PedHandles)
+                    if (IS_THIS_PRINT_BEING_DISPLAYED(buffGXT, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+                        giveBuffs = true;
+
+                    if (giveBuffs)
                     {
-                        int pedHandle = ped.Value;
-                        if (!IS_PED_A_MISSION_PED(pedHandle))
-                            continue;
-                        if (pedHandle == Main.PlayerHandle)
-                            continue;
-                        if (IS_CHAR_INJURED(pedHandle))
-                            continue;
-                        if (PedList.Contains(pedHandle))
-                            continue;
-
-                        foreach (string pedModel in ModelList)
+                        foreach (var ped in PedHelper.PedHandles)
                         {
-                            GET_CHAR_MODEL(pedHandle, out int pModel);
+                            int pedHandle = ped.Value;
+                            if (!IS_PED_A_MISSION_PED(pedHandle))
+                                continue;
+                            if (pedHandle == Main.PlayerHandle)
+                                continue;
+                            if (IS_CHAR_INJURED(pedHandle))
+                                continue;
+                            if (PedList.Contains(pedHandle))
+                                continue;
 
-                            if (pModel == GET_HASH_KEY(pedModel))
+                            foreach (string pedModel in ModelList)
                             {
-                                PedList.Add(pedHandle);
+                                GET_CHAR_MODEL(pedHandle, out int pModel);
 
-                                if (HealthList[ModelList.IndexOf(pedModel)] > 0)
+                                if (pModel == GET_HASH_KEY(pedModel))
                                 {
-                                    GET_CHAR_HEALTH(pedHandle, out uint pHealth);
-                                    SET_CHAR_MAX_HEALTH(pedHandle, (uint)(pHealth + HealthList[ModelList.IndexOf(pedModel)]));
-                                    SET_CHAR_HEALTH(pedHandle, (uint)(pHealth + HealthList[ModelList.IndexOf(pedModel)]));
-                                }
+                                    PedList.Add(pedHandle);
 
-                                if (giveArmor)
-                                {
-                                    GET_CHAR_ARMOUR(pedHandle, out uint pedArmor);
-                                    if (pedArmor < 100)
-                                        ADD_ARMOUR_TO_CHAR(pedHandle, 100);
+                                    if (HealthList[ModelList.IndexOf(pedModel)] > 0)
+                                    {
+                                        GET_CHAR_HEALTH(pedHandle, out uint pHealth);
+                                        SET_CHAR_MAX_HEALTH(pedHandle, (uint)(pHealth + HealthList[ModelList.IndexOf(pedModel)]));
+                                        SET_CHAR_HEALTH(pedHandle, (uint)(pHealth + HealthList[ModelList.IndexOf(pedModel)]));
+                                    }
+
+                                    if (giveArmor)
+                                    {
+                                        GET_CHAR_ARMOUR(pedHandle, out uint pedArmor);
+                                        if (pedArmor < 100)
+                                            ADD_ARMOUR_TO_CHAR(pedHandle, 100);
+                                    }
                                 }
                             }
                         }
@@ -146,6 +157,7 @@ namespace MissionStuff.ivsdk
                 else if (missionName == MissionSCO)
                 {
                     PedList.Clear();
+                    giveBuffs = false;
                     missionName = "";
                 }
             }

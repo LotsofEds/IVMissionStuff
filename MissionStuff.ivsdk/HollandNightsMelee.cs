@@ -14,7 +14,7 @@ using static IVSDKDotNet.Native.Natives;
 
 namespace MissionStuff.ivsdk
 {
-    internal class BuffedEnemies
+    internal class HollandNightsMelee
     {
         private static readonly List<string> SCOList = new List<string>();
         public static readonly List<string> ModelList = new List<string>();

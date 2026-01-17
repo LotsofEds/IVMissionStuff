@@ -58,8 +58,10 @@
     <Compile Include="EscuelaOfTheSleep.cs" />
     <Compile Include="GangRelationships.cs" />
     <Compile Include="GiveYouSharesNB.cs" />
+    <Compile Include="HollandNightsMelee.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="HaveAHeartTimed.cs" />
+    <Compile Include="NiksteinFiles.cs" />
     <Compile Include="Pills.cs" />
     <Compile Include="ProgressLock.cs" />
     <Compile Include="SCOLoader.cs" />
