@@ -859,9 +859,9 @@ namespace MissionStuff.ivsdk
                     }
                     else if ((injPedCount >= 1 || inCombat) && (missionStage == 2 || missionStage == 3))
                     {
-                        if (LOCATE_CHAR_ANY_MEANS_3D(Main.PlayerHandle, -61.0304f, 1327.25f, 26.2806f, 4.0f, 4.0f, 2.0f, false) || LOCATE_CHAR_ANY_MEANS_3D(Main.PlayerHandle, -115.287f, 1327.25f, 26.2806f, 4.0f, 4.0f, 2.0f, false))
+                        if (LOCATE_CHAR_ANY_MEANS_3D(Main.PlayerHandle, -61.0304f, 1327.25f, 26.2806f, 8.0f, 8.0f, 2.0f, false) || LOCATE_CHAR_ANY_MEANS_3D(Main.PlayerHandle, -115.287f, 1327.25f, 26.2806f, 8.0f, 8.0f, 2.0f, false))
                         {
-                            if (LOCATE_CHAR_ANY_MEANS_3D(Main.PlayerHandle, -61.0304f, 1327.25f, 26.2806f, 4.0f, 4.0f, 2.0f, false))
+                            if (LOCATE_CHAR_ANY_MEANS_3D(Main.PlayerHandle, -61.0304f, 1327.25f, 26.2806f, 8.0f, 8.0f, 2.0f, false))
                             {
                                 SET_CHAR_COORDINATES(PedTPListA[0], -57.1508f, 1325.15f, 20.2074f);
                                 SET_CHAR_COORDINATES(PedTPListA[1], -57.1508f, 1324.15f, 20.2074f);
@@ -870,7 +870,7 @@ namespace MissionStuff.ivsdk
                                 SET_CHAR_RELATIONSHIP(PedTPListA[0], (int)eRelationship.RELATIONSHIP_HATE, (int)eRelationshipGroup.RELATIONSHIP_GROUP_PLAYER);
                                 SET_CHAR_RELATIONSHIP(PedTPListA[1], (int)eRelationship.RELATIONSHIP_HATE, (int)eRelationshipGroup.RELATIONSHIP_GROUP_PLAYER);
                             }
-                            else if (LOCATE_CHAR_ANY_MEANS_3D(Main.PlayerHandle, -115.287f, 1327.25f, 26.2806f, 4.0f, 4.0f, 2.0f, false))
+                            else if (LOCATE_CHAR_ANY_MEANS_3D(Main.PlayerHandle, -115.287f, 1327.25f, 26.2806f, 8.0f, 8.0f, 2.0f, false))
                             {
                                 SET_CHAR_COORDINATES(PedTPListB[0], -119.163f, 1325.15f, 20.2074f);
                                 SET_CHAR_COORDINATES(PedTPListB[1], -119.163f, 1324.15f, 20.2074f);

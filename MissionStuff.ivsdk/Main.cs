@@ -40,6 +40,8 @@ namespace MissionStuff.ivsdk
         public static bool reduceMoneyEnable;
         public static bool policeBribeEnable;
         public static bool copShotgunFixEnable;
+        public static bool recessionEnable;
+        public static bool fastAllyEnable;
 
         // HangoutRewards
         public static bool romanRevenueEnable;
@@ -66,17 +68,20 @@ namespace MissionStuff.ivsdk
         public static SettingsFile savefileSettings;
         public static SettingsFile bribeSettings;
 
+        // OtherINIShit
+        public static int menuKey;
+
         // OtherShit
         public static uint gTimer;
+        public static uint mTimer;
         public static float frameTime;
+        internal static SimpleMenu actionMenu;
         public Main()
         {
             Uninitialize += Main_Uninitialize;
             Initialized += Main_Initialized;
-            GameLoad += Main_GameLoad; ;
+            GameLoad += Main_GameLoad;
             IngameStartup += Main_IngameStartup;
-            KeyDown += Main_KeyDown;
-            KeyUp += Main_KeyUp;
             Tick += Main_Tick;
         }
 
@@ -99,6 +104,8 @@ namespace MissionStuff.ivsdk
                 VCSBuyBackWeapons.IngameStart();
             if (unrestEnable)
                 UnrestfulSleep.IngameStart();
+            if (reduceMoneyEnable)
+                ReducedMoney.IngameStart();
         }
         private void Main_Uninitialize(object sender, EventArgs e)
         {
@@ -126,6 +133,8 @@ namespace MissionStuff.ivsdk
             bribeSettings.Load();
             scoSettings = new SettingsFile(string.Format("{0}\\IVSDKDotNet\\scripts\\MissionStuff\\SCOSettings.ini", IVGame.GameStartupPath));
             scoSettings.Load();
+
+            actionMenu = new SimpleMenu("Action Menu");
 
             Init(Settings);
 
@@ -159,6 +168,10 @@ namespace MissionStuff.ivsdk
                 ReducedMoney.Init(Settings);
             if (policeBribeEnable)
                 RealPoliceCorruption.Init(Settings);
+            if (copShotgunFixEnable)
+                CopShotgunFix.Init(Settings);
+            if (fastAllyEnable)
+                FasterAllies.Init(Settings);
 
             if (romanRevenueEnable)
                 GiveYouSharesNB.Init(Settings);
@@ -213,6 +226,8 @@ namespace MissionStuff.ivsdk
             reduceMoneyEnable = settings.GetBoolean("REDUCED REWARDS", "Enable", false);
             policeBribeEnable = settings.GetBoolean("ACTUAL BRIBES", "Enable", false);
             copShotgunFixEnable = settings.GetBoolean("COP CAR SHOTGUN FIX", "Enable", false);
+            recessionEnable = settings.GetBoolean("2008 RECESSION SIMULATOR", "Enable", false);
+            fastAllyEnable = settings.GetBoolean("KEEP UP, MOTHERFUCKER", "Enable", false);
 
             romanRevenueEnable = settings.GetBoolean("I'LL GIVE YOU SHARES, NB", "Enable", false);
             pillsEnable = settings.GetBoolean("PACKIE'S PILLS", "Enable", false);
@@ -230,31 +245,9 @@ namespace MissionStuff.ivsdk
             masterBaitEnable = settings.GetBoolean("MASTER BAITER", "Enable", false);
             chaseExtendEnable = settings.GetBoolean("B-BUT SCRIPTED CHASES BAAAD", "Enable", false);
             explosiveTrapEnable = settings.GetBoolean("EXPLOSIVE NEGOTIATION", "Enable", false);
+
+            menuKey = settings.GetInteger("MAIN", "MenuKey", 0);
         }
-
-        private void Main_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (!InitialChecks())
-                return;
-
-            if (PlayerPed == null)
-                return;
-
-            if (pillsEnable)
-                Pills.KeyDown();
-        }
-        private void Main_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (!InitialChecks())
-                return;
-
-            if (PlayerPed == null)
-                return;
-
-            if (pillsEnable)
-                Pills.KeyUp();
-        }
-
         public static bool InitialChecks()
         {
             if (IS_PAUSE_MENU_ACTIVE()) return false;
@@ -278,6 +271,8 @@ namespace MissionStuff.ivsdk
 
             PedHelper.GrabAllPeds();
             VehHelper.GrabAllVehicles();
+
+            ProcessMenu();
 
             if (hollandNightsEnable)
                 HollandNightsMelee.Tick();
@@ -316,6 +311,8 @@ namespace MissionStuff.ivsdk
                 RealPoliceCorruption.Tick();
             if (copShotgunFixEnable)
                 CopShotgunFix.Tick();
+            if (fastAllyEnable)
+                FasterAllies.Tick();
 
             if (romanRevenueEnable)
                 GiveYouSharesNB.Tick();
@@ -361,6 +358,21 @@ namespace MissionStuff.ivsdk
                 DeathAndTaxes.SetSaveData(savefileSettings);
             }
         }
+        public void ProcessMenu()
+        {
+            if (NativeControls.IsGameKeyPressed(0, (GameKey)menuKey))
+            {
+                if (Main.gTimer >= mTimer + 500)
+                    actionMenu.Show();
+            }
+            else
+                GET_GAME_TIMER(out mTimer);
+
+            //if (actionMenu.IsActive && IS_CONTROL_JUST_PRESSED(0, (int)GameKey.NavBack))
+                //actionMenu.Hide();
+
+            actionMenu.Tick();
+        }
         public static List<int> GetWeaponInventory(bool IncludeMelee)
         {
             List<int> inventory = new List<int>();
@@ -392,6 +404,12 @@ namespace MissionStuff.ivsdk
             }
 
             return ammoCounts;
+        }
+        public static float Clamp(float value, float min, float max)
+        {
+            if (value < min) return min;
+            if (value > max) return max;
+            return value;
         }
     }
 }

@@ -22,15 +22,23 @@ namespace MissionStuff.ivsdk
         private static readonly List<string> SCOList = new List<string>();
         //private static int originalReward;
         private static int moneyLost;
+        private static string moneyGXT;
         private static bool debug;
 
         // OtherShit
         private static string missionName;
+        private static bool reductMoney;
         private static int missionsPassed;
 
+        public static void IngameStart()
+        {
+            missionName = "";
+            reductMoney = false;
+        }
         public static void UnInit()
         {
             missionName = "";
+            reductMoney = false;
         }
         public static void Init(SettingsFile settings)
         {
@@ -49,6 +57,7 @@ namespace MissionStuff.ivsdk
         private static void LoadMissionData(SettingsFile settings, string scoName)
         {
             //originalReward = settings.GetInteger(scoName, "OriginalReward", 0);
+            moneyGXT = settings.GetValue(scoName, "RMOnlyIfThisGXTShown", "none");
             moneyLost = settings.GetInteger(scoName, "MoneyReduction", 0);
         }
         public static void Tick()
@@ -63,11 +72,13 @@ namespace MissionStuff.ivsdk
                         missionName = MissionSCO;
                         missionsPassed = GET_INT_STAT(253);
                     }
+                    if (!reductMoney && (IS_THIS_PRINT_BEING_DISPLAYED(moneyGXT, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) || moneyGXT == "none"))
+                        reductMoney = true;
                 }
                 else if (missionName == MissionSCO)
                 {
                     STORE_SCORE(Main.PlayerIndex, out uint newMoney);
-                    if (missionsPassed < GET_INT_STAT(253))
+                    if (missionsPassed < GET_INT_STAT(253) && reductMoney)
                     {
                         if (debug)
                             IVGame.ShowSubtitleMessage(moneyLost.ToString());
@@ -77,7 +88,7 @@ namespace MissionStuff.ivsdk
                             DO_AUTO_SAVE();
                     }
 
-                    missionName = "";
+                    UnInit();
                 }
             }
         }

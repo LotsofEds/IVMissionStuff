@@ -19,9 +19,6 @@ namespace MissionStuff.ivsdk
     {
         // IniShit
         private static float packieStat;
-        private static Keys antiDepressKey;
-        private static Keys adrenalineKey;
-        private static Keys painKillerKey;
         private static int antiDepressHeal;
         private static int adrenalineDuration;
         private static int painKillerDuration;
@@ -37,7 +34,6 @@ namespace MissionStuff.ivsdk
         // BooleShit
         private static bool canBuyPills;
         private static bool inMenu;
-        private static bool keyPressed;
         private static bool pillActive;
         private static bool takeAntiDepress;
         private static bool takeAdrenaline;
@@ -62,6 +58,7 @@ namespace MissionStuff.ivsdk
         private static int objHandle;
         private static uint oldHealth;
 
+        private static SimpleMenu pillMenu;
         private static bool CheckCooldown()
         {
             if (Main.gTimer >= fTimer + pillCooldown)
@@ -75,50 +72,6 @@ namespace MissionStuff.ivsdk
 
             if (!IS_THIS_HELP_MESSAGE_BEING_DISPLAYED("TM_1_6"))
                 PRINT_HELP("TM_1_6");
-        }
-        public static void KeyDown()
-        {
-            if (IS_PLAYER_CONTROL_ON(Main.PlayerIndex))
-            {
-                if (IVGame.IsKeyPressed(adrenalineKey) && !keyPressed && aPillCount > 0)
-                {
-                    keyPressed = true;
-                    if (CheckCooldown())
-                    {
-                        if (!pillActive)
-                            Adrenaline();
-                    }
-                    else
-                        DisplayDoseText();
-                }
-                else if (IVGame.IsKeyPressed(painKillerKey) && !keyPressed && pPillCount > 0)
-                {
-                    keyPressed = true;
-                    if (CheckCooldown())
-                    {
-                        if (!pillActive)
-                        PainKiller();
-                    }
-                    else
-                        DisplayDoseText();
-                }
-                else if (IVGame.IsKeyPressed(antiDepressKey) && !keyPressed && dPillCount > 0)
-                {
-                    keyPressed = true;
-                    if (CheckCooldown())
-                    {
-                        if (!pillActive)
-                        AntiDepressant();
-                    }
-                    else
-                        DisplayDoseText();
-                }
-            }
-        }
-        public static void KeyUp()
-        {
-            if (!IVGame.IsKeyPressed(adrenalineKey) && !IVGame.IsKeyPressed(painKillerKey) && !IVGame.IsKeyPressed(antiDepressKey) && keyPressed)
-                keyPressed = false;
         }
         public static void UnInit()
         {
@@ -137,9 +90,6 @@ namespace MissionStuff.ivsdk
         public static void Init (SettingsFile settings)
         {
             packieStat = settings.GetFloat("PACKIE'S PILLS", "LikeRequirement", 80);
-            antiDepressKey = settings.GetKey("PACKIE'S PILLS", "AntiDepressantKey", Keys.J);
-            adrenalineKey = settings.GetKey("PACKIE'S PILLS", "AdrenalineKey", Keys.K);
-            painKillerKey = settings.GetKey("PACKIE'S PILLS", "PainkillerKey", Keys.L);
             antiDepressHeal = settings.GetInteger("PACKIE'S PILLS", "AntiDepressantHealAmount", 25);
             adrenalineDuration = settings.GetInteger("PACKIE'S PILLS", "AdrenalineDuration", 20000);
             painKillerDuration = settings.GetInteger("PACKIE'S PILLS", "PainkillerDuration", 20000);
@@ -151,6 +101,36 @@ namespace MissionStuff.ivsdk
             painkillerCost = settings.GetInteger("PACKIE'S PILLS", "PainkilllerCost", 200);
             maxPills = settings.GetInteger("PACKIE'S PILLS", "MaxPills", 3);
             pillCooldown = settings.GetInteger("PACKIE'S PILLS", "PillCooldown", 300000);
+
+            InitMenu();
+        }
+        public static void InitMenu()
+        {
+            pillMenu = new SimpleMenu("Pills");
+
+            Func<string> menuName = () => "Pills";
+            Action pillAction = pillMenu.Show;
+            Func<string> pillDescription = () => "Take performance-enhancing pills.";
+
+            Main.actionMenu.AddItem(menuName, pillAction, pillDescription, null, null);
+            
+            menuName = () => "Adrenaline Pills";
+            pillAction = Adrenaline;
+            pillDescription = () => "Slows down time and increases movement speed for a short period of time.";
+
+            pillMenu.AddItem(menuName, pillAction, pillDescription, null, null);
+
+            menuName = () => "Painkillers";
+            pillAction = PainKiller;
+            pillDescription = () => "Reduces damage taken by half for a short period of time.";
+
+            pillMenu.AddItem(menuName, pillAction, pillDescription, null, null);
+
+            menuName = () => "Anti-Depressants";
+            pillAction = AntiDepressant;
+            pillDescription = () => "Replenishes a small amount of health immediately.";
+
+            pillMenu.AddItem(menuName, pillAction, pillDescription, null, null);
         }
         public static void SavePillCount(SettingsFile settings)
         {
@@ -192,7 +172,7 @@ namespace MissionStuff.ivsdk
 
                     NativeBlip pBlip = new NativeBlip(pillBlip);
 
-                    pBlip.Icon = (BlipIcon)108;
+                    pBlip.Icon = BlipIcon.Pickup_Health;
                     pBlip.Name = "Pills";
                     pBlip.Display = eBlipDisplay.BLIP_DISPLAY_ARROW_AND_MAP;
                     pBlip.Scale = 0.5f;
@@ -204,7 +184,7 @@ namespace MissionStuff.ivsdk
                     if (!IS_THIS_HELP_MESSAGE_BEING_DISPLAYED("TM_2_20") && !IS_THIS_HELP_MESSAGE_BEING_DISPLAYED("TM_1_5") && !inMenu)
                     {
                         IVText.TheIVText.ReplaceTextOfTextLabel("TM_2_20", "~s~Press ~INPUT_PICKUP~ to buy pills.");
-                        PRINT_HELP_WITH_STRING_NO_SOUND("TM_2_20", "");
+                        PRINT_HELP_FOREVER("TM_2_20");
                     }
                     if (IS_CONTROL_JUST_PRESSED(0, (int)GameKey.Action) || IS_CONTROL_JUST_PRESSED(2, (int)GameKey.Action))
                     {
@@ -229,21 +209,21 @@ namespace MissionStuff.ivsdk
                             pillName = "Adrenaline pills";
                             pillCost = adrenalineCost;
                             pillCount = aPillCount;
-                            pillDesc = "~s~Slows down time and increases movement speed for a short period of time. Press " + adrenalineKey.ToString() + " to take.";
+                            pillDesc = "~s~Slows down time and increases movement speed for a short period of time.";
                         }
                         else if (pillIndex == 1)
                         {
                             pillName = "Painkillers";
                             pillCost = painkillerCost;
                             pillCount = pPillCount;
-                            pillDesc = "~s~Reduces damage taken by half for a short period of time. Press " + painKillerKey.ToString() + "to take.";
+                            pillDesc = "~s~Reduces damage taken by half for a short period of time.";
                         }
                         else if (pillIndex == 2)
                         {
                             pillName = "Anti-depressants";
                             pillCost = antiDepressCost;
                             pillCount = dPillCount;
-                            pillDesc = "~s~Replenishes a small amount of health immediately. Press " + antiDepressKey.ToString() + " to take.";
+                            pillDesc = "~s~Replenishes a small amount of health immediately.";
                         }
 
                         if (!IS_THIS_HELP_MESSAGE_BEING_DISPLAYED("TM_1_5") && !IS_THIS_HELP_MESSAGE_BEING_DISPLAYED("TM_2_20") && !IS_THIS_HELP_MESSAGE_BEING_DISPLAYED("TM_2_21") && !IS_THIS_HELP_MESSAGE_BEING_DISPLAYED("TM_2_22"))
@@ -254,7 +234,7 @@ namespace MissionStuff.ivsdk
                             //IVGame.ShowSubtitleMessage(pillDesc);
                         }
                         IVText.TheIVText.ReplaceTextOfTextLabel("PLACEHOLDER_1", pillDesc);
-                        PRINT("PLACEHOLDER_1", 1000, false);
+                        PRINT_NOW("PLACEHOLDER_1", 100, false);
                         //IVGame.ShowSubtitleMessage(pillDesc);
 
                         if (IS_CONTROL_JUST_PRESSED(0, (int)GameKey.NavEnter) || IS_CONTROL_JUST_PRESSED(2, (int)GameKey.NavEnter))
@@ -265,7 +245,7 @@ namespace MissionStuff.ivsdk
                                 ADD_SCORE(Main.PlayerIndex, -pillCost);
                                 if (pillIndex == 0)
                                     aPillCount++;
-                                
+
                                 else if (pillIndex == 1)
                                     pPillCount++;
 
@@ -294,6 +274,8 @@ namespace MissionStuff.ivsdk
                                 pillIndex--;
                             else
                                 pillIndex = 2;
+
+                            CLEAR_HELP();
                         }
 
                         else if (IS_CONTROL_JUST_PRESSED(0, (int)GameKey.NavRight) || IS_CONTROL_JUST_PRESSED(2, (int)GameKey.NavRight))
@@ -304,9 +286,13 @@ namespace MissionStuff.ivsdk
                                 pillIndex++;
                             else
                                 pillIndex = 0;
+
+                            CLEAR_HELP();
                         }
                     }
                 }
+                else if (IS_THIS_HELP_MESSAGE_BEING_DISPLAYED("TM_2_20"))
+                    CLEAR_HELP();
             }
         }
         public static void Tick()
@@ -318,6 +304,7 @@ namespace MissionStuff.ivsdk
                 dPillCount = Main.savefileSettings.GetInteger(IVGenericGameStorage.ValidSaveName, "AntiDepressantCount", 0);
                 gotPillCount = true;
             }
+            pillMenu.Tick();
             ProcessBuying();
 
             if (!HAVE_ANIMS_LOADED("amb@sprunk_plyr"))
@@ -414,25 +401,49 @@ namespace MissionStuff.ivsdk
         }
         private static void Adrenaline()
         {
-            TakePill();
-            aPillCount--;
-            takeAdrenaline = true;
+            if (CheckCooldown())
+            {
+                if (!pillActive)
+                {
+                    TakePill();
+                    aPillCount--;
+                    takeAdrenaline = true;
+                }
+            }
+            else
+                DisplayDoseText();
         }
         private static void PainKiller()
         {
-            TakePill();
-            pPillCount--;
-            takePainkiller = true;
+            if (CheckCooldown())
+            {
+                if (!pillActive)
+                {
+                    TakePill();
+                    pPillCount--;
+                    takePainkiller = true;
+                }
+            }
+            else
+                DisplayDoseText();
         }
         private static void AntiDepressant()
         {
-            TakePill();
-            dPillCount--;
-            GET_CHAR_HEALTH(Main.PlayerHandle, out uint pHealth);
-            SET_CHAR_HEALTH(Main.PlayerHandle, pHealth + (uint)antiDepressHeal);
-            SET_TIMECYCLE_MODIFIER(antiDepressScreenFx);
-            GET_GAME_TIMER(out fTimer);
-            takeAntiDepress = true;
+            if (CheckCooldown())
+            {
+                if (!pillActive)
+                {
+                    TakePill();
+                    dPillCount--;
+                    GET_CHAR_HEALTH(Main.PlayerHandle, out uint pHealth);
+                    SET_CHAR_HEALTH(Main.PlayerHandle, pHealth + (uint)antiDepressHeal);
+                    SET_TIMECYCLE_MODIFIER(antiDepressScreenFx);
+                    GET_GAME_TIMER(out fTimer);
+                    takeAntiDepress = true;
+                }
+            }
+            else
+                DisplayDoseText();
         }
     }
 }

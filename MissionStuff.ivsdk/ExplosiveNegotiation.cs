@@ -73,9 +73,6 @@ namespace MissionStuff.ivsdk
         }
         public static void Tick()
         {
-            if (IS_CONTROL_JUST_PRESSED(0, (int)GameKey.RadarZoom))
-            {
-            }
             if (NativeGame.IsScriptRunning("roman12"))
             {
                 if (!DOES_OBJECT_EXIST(bombProp) && HAS_MODEL_LOADED(GET_HASH_KEY("ec_bomb")))

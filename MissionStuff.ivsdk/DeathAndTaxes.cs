@@ -47,8 +47,9 @@ namespace MissionStuff.ivsdk
             reduceHealth = settings.GetBoolean("REALISTIC U.S. HEALTHCARE", "NoFreeHealthcare", false);
             romanRescue = settings.GetBoolean("REALISTIC U.S. HEALTHCARE", "RomanFreebie", false);
 
-            billAmountNormal = settings.GetInteger("REALISTIC U.S. HEALTHCARE", "HospitalBillAmount", 10000);
-            billAmountRecession = settings.GetInteger("2008 RECESSION SIMULATOR", "HospitalBillAmount", 15000);
+            billAmountNormal = settings.GetInteger("REALISTIC U.S. HEALTHCARE", "HospitalBillAmount", 5000);
+            if (Main.recessionEnable)
+                billAmountRecession = settings.GetInteger("2008 RECESSION SIMULATOR", "HospitalBillAmount", 7500);
 
             healthReduction = settings.GetInteger("REALISTIC U.S. HEALTHCARE", "MaxHealthReductionPerDeath", 10);
             reductionTime = settings.GetInteger("REALISTIC U.S. HEALTHCARE", "HealthReductionTime", 720000);
@@ -94,7 +95,7 @@ namespace MissionStuff.ivsdk
 
             if (IS_CHAR_DEAD(Main.PlayerHandle) && IS_SCREEN_FADING_OUT())
             {
-                if (GET_FLOAT_STAT(22) < 80)
+                if (GET_FLOAT_STAT(22) < 80 || !Main.recessionEnable)
                     billAmount = billAmountNormal;
                 else
                     billAmount = billAmountRecession;

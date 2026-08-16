@@ -64,6 +64,7 @@
     <Compile Include="EscuelaOfTheSleep.cs" />
     <Compile Include="ExecutionFix.cs" />
     <Compile Include="ExplosiveNegotiation.cs" />
+    <Compile Include="FasterAllies.cs" />
     <Compile Include="GangRelationships.cs" />
     <Compile Include="GetGlobals.cs" />
     <Compile Include="GiveYouSharesNB.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="ReducedMoney.cs" />
     <Compile Include="RelationshipAdjust.cs" />
     <Compile Include="SCOLoader.cs" />
+    <Compile Include="SimpleMenu.cs" />
     <Compile Include="TimedToBlow.cs" />
     <Compile Include="PedHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

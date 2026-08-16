@@ -28,7 +28,6 @@ namespace MissionStuff.ivsdk
 
         // OtherShit
         private static string missionName;
-        private static bool gotList;
         private static bool hasSkipped;
         private static bool activateTripSkip;
         private static bool endSkipTrip;
@@ -80,10 +79,10 @@ namespace MissionStuff.ivsdk
                 missionData[i].RequireMissionVeh = Main.scoSettings.GetBoolean(scoName, "TSRequireMissionVeh", false);
                 missionData[i].RequireAnyVeh = Main.scoSettings.GetBoolean(scoName, "TSRequireVehicle", false);
                 missionData[i].TpCoords = Main.scoSettings.GetVector3(scoName, "TSTeleportCoords", Vector3.Zero);
-                missionData[i].TpHdng = Main.scoSettings.GetFloat(scoName, "TSTeleportCoords", 0);
+                missionData[i].TpHdng = Main.scoSettings.GetFloat(scoName, "TSTeleportHeading", 0);
                 missionData[i].CheckpointGXT = Main.scoSettings.GetValue(scoName, "CheckpointGXT", "");
 
-                string pedString = Main.scoSettings.GetValue(scoName, "TSFriendlyModels", "");
+                string pedString = Main.scoSettings.GetValue(scoName, "TSFriendlyModels", "none");
                 missionData[i].ModelList = new List<string>();
 
                 foreach (var pedModel in pedString.Split(','))
@@ -104,14 +103,13 @@ namespace MissionStuff.ivsdk
         {
             SkipTheTrip();
             EndTrip();
-
-            if (!IS_SCREEN_FADED_OUT())
+            
+            foreach (string sco in MissionList)
             {
-                foreach (string sco in MissionList)
+                if (NativeGame.IsScriptRunning(sco))
                 {
-                    if (NativeGame.IsScriptRunning(sco))
+                    if (!IS_SCREEN_FADED_OUT() && IS_PLAYER_CONTROL_ON(Main.PlayerIndex))
                     {
-                        PedHelper.GrabAllPeds();
                         LoadCheckpointData(sco);
 
                         if (IS_CHAR_IN_ANY_CAR(Main.PlayerHandle))
@@ -141,6 +139,9 @@ namespace MissionStuff.ivsdk
                                     PedList.Add(pedHandle);
                             }
                         }
+                        if (PedList.Count < missionData[MissionList.IndexOf(sco)].ModelList.Count && missionData[MissionList.IndexOf(sco)].ModelList[0] != "none")
+                            canTripSkip = false;
+
                         foreach (var ped in PedList)
                         {
                             if (!DOES_CHAR_EXIST(ped))
@@ -161,6 +162,7 @@ namespace MissionStuff.ivsdk
                             }
                             else
                             {
+                                hasSkipped = false;
                                 canTripSkip = false;
                                 break;
                             }
@@ -189,7 +191,7 @@ namespace MissionStuff.ivsdk
                                     IVText.TheIVText.ReplaceTextOfTextLabel("TM_2_23", "Hold ~INPUT_PICKUP~ when stopped to skip the trip.");
                                 else
                                     IVText.TheIVText.ReplaceTextOfTextLabel("TM_2_23", "Hold ~INPUT_PICKUP~ when stopped to skip the trip. It will cost $" + ((int)(pDist * costMult)).ToString());
-                                
+
                                 PRINT_HELP("TM_2_23");
                                 printHelp = true;
                             }
@@ -221,14 +223,14 @@ namespace MissionStuff.ivsdk
                                 GET_GAME_TIMER(out fTimer);
                         }
                     }
-                    else if (missionName == sco)
-                    {
-                        printHelp = false;
-                        gotList = false;
-                        PedList.Clear();
-                        if (hasSkipped)
-                            hasSkipped = false;
-                    }
+                }
+                else if (missionName == sco)
+                {
+                    printHelp = false;
+                    PedList.Clear();
+                    hasSkipped = false;
+                    activateTripSkip = false;
+                    endSkipTrip = false;
                 }
             }
         }
@@ -254,18 +256,22 @@ namespace MissionStuff.ivsdk
                 SET_CHAR_HEADING(pVehicle, teleportHdng);
             }
 
-            if (Main.gTimer >= fTimer + 2500)
-                endSkipTrip = true;
+            GET_GAME_TIMER(out fTimer);
+            endSkipTrip = true;
         }
         private static void EndTrip()
         {
+            if (Main.gTimer < fTimer + 2000)
+                return;
+
             if (!endSkipTrip)
                 return;
 
             if (reqVeh || missionVeh)
                 SET_CAR_ON_GROUND_PROPERLY(pVehicle);
 
-            DO_SCREEN_FADE_IN(1000);
+            if (!IS_SCREEN_FADED_IN() && !IS_SCREEN_FADING_IN())
+                DO_SCREEN_FADE_IN(1000);
             endSkipTrip = false;
             activateTripSkip = false;
         }

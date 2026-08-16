@@ -48,9 +48,12 @@ namespace MissionStuff.ivsdk
             twoStarBribeNormal = settings.GetInteger("ACTUAL BRIBES", "BribeAmountTwoStar", 25000);
             threeStarBribeNormal = settings.GetInteger("ACTUAL BRIBES", "BribeAmountThreeStar", 50000);
 
-            oneStarBribeRecession = settings.GetInteger("2008 RECESSION SIMULATOR", "BribeAmountOneStar", 15000);
-            twoStarBribeRecession = settings.GetInteger("2008 RECESSION SIMULATOR", "BribeAmountTwoStar", 40000);
-            threeStarBribeRecession = settings.GetInteger("2008 RECESSION SIMULATOR", "BribeAmountThreeStar", 75000);
+            if (Main.recessionEnable)
+            {
+                oneStarBribeRecession = settings.GetInteger("2008 RECESSION SIMULATOR", "BribeAmountOneStar", 15000);
+                twoStarBribeRecession = settings.GetInteger("2008 RECESSION SIMULATOR", "BribeAmountTwoStar", 40000);
+                threeStarBribeRecession = settings.GetInteger("2008 RECESSION SIMULATOR", "BribeAmountThreeStar", 75000);
+            }
 
             bribeOnDeath = settings.GetBoolean("ACTUAL BRIBES", "NoEasyWayOut", false);
             prisonEnable = settings.GetBoolean("ACTUAL BRIBES", "PrisonBitch", false);
@@ -63,7 +66,7 @@ namespace MissionStuff.ivsdk
 
             if ((HAS_CHAR_BEEN_ARRESTED(Main.PlayerHandle) && !deathArrest) || (IS_CHAR_DEAD(Main.PlayerHandle) && bribeOnDeath && !isDead))
             {
-                if (GET_FLOAT_STAT(22) < 80)
+                if (GET_FLOAT_STAT(22) < 80 || !Main.recessionEnable)
                 {
                     if (IS_WANTED_LEVEL_GREATER(Main.PlayerIndex, 2))
                         bribeAmount = threeStarBribeNormal;

@@ -27,10 +27,13 @@ namespace MissionStuff.ivsdk
         private static readonly List<int> NewWeaponList = new List<int>();
         private static readonly List<int> WeapChanceList = new List<int>();
         private static readonly List<int> PedWeapList = new List<int>();
+        public static readonly List<string> GXTList = new List<string>();
+
+        private static bool buffIfHurt;
 
         // OtherShit
         private static string missionName;
-        private static string buffGXT;
+        //private static string buffGXT;
         private static bool buffMissionPeds;
         private static bool giveBuffs;
         private static uint armorChance;
@@ -49,7 +52,7 @@ namespace MissionStuff.ivsdk
                     SCOList.Add(SCOName);
             }
         }
-        private static void LoadMissionData(SettingsFile settings, string scoName)
+        private static void ClearLists()
         {
             ModelList.Clear();
             PedList.Clear();
@@ -62,12 +65,17 @@ namespace MissionStuff.ivsdk
             NewWeaponList.Clear();
             WeapChanceList.Clear();
             PedWeapList.Clear();
+            GXTList.Clear();
+        }
+        private static void LoadMissionData(SettingsFile settings, string scoName)
+        {
+            ClearLists();
 
             string pedString = settings.GetValue(scoName, "SpecialPedModels", "");
             foreach (var pedModel in pedString.Split(','))
                 ModelList.Add(pedModel);
 
-            string HealthString = settings.GetValue(scoName, "SpecialPedHealthIncrease", "0");
+            string HealthString = settings.GetValue(scoName, "SpecialPedHealth", "0");
             foreach (var HealthValue in HealthString.Split(','))
             {
                 int HealthAmount = Int32.Parse(HealthValue.Trim());
@@ -95,7 +103,10 @@ namespace MissionStuff.ivsdk
                 ArmorList.Add(ArmoredPed);
             }
 
-            buffGXT = settings.GetValue(scoName, "BuffSpecialPedGXT", "none");
+            string BuffGXTs = settings.GetValue(scoName, "BuffSpecialPedGXT", "none");
+            foreach (var gxts in BuffGXTs.Split(','))
+                GXTList.Add(gxts);
+            //buffGXT = settings.GetValue(scoName, "BuffSpecialPedGXT", "none");
 
             buffMissionPeds = settings.GetBoolean(scoName, "BuffAllOtherMissionPeds", false);
 
@@ -120,6 +131,7 @@ namespace MissionStuff.ivsdk
                 WeapChanceList.Add(WeaponChance);
             }
 
+            buffIfHurt = settings.GetBoolean(scoName, "SpecialPedApplyBuffUntilHurtByPlayer", false);
             healthIncrease = settings.GetUInteger(scoName, "MissionPedHealthIncrease", 0);
             armorChance = settings.GetUInteger(scoName, "MissionPedArmorChance", 0);
         }
@@ -135,8 +147,12 @@ namespace MissionStuff.ivsdk
                         missionName = MissionSCO;
                         LoadMissionData(Main.scoSettings, MissionSCO);
                     }
-                    if (IS_THIS_PRINT_BEING_DISPLAYED(buffGXT, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) || buffGXT == "none")
-                        giveBuffs = true;
+
+                    foreach (string gxt in GXTList)
+                    {
+                        if (IS_THIS_PRINT_BEING_DISPLAYED(gxt, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) || gxt == "none")
+                            giveBuffs = true;
+                    }
 
                     foreach (var ped in PedHelper.PedHandles)
                     {
@@ -158,13 +174,10 @@ namespace MissionStuff.ivsdk
                             {
                                 if (giveBuffs && !SpecialPedList.Contains(pedHandle))
                                 {
-                                    SpecialPedList.Add(pedHandle);
-
                                     if (HealthList.Count == ModelList.Count && HealthList[ModelList.IndexOf(pedModel)] > 0)
                                     {
-                                        GET_CHAR_HEALTH(pedHandle, out uint pHealth);
-                                        SET_CHAR_MAX_HEALTH(pedHandle, (uint)(pHealth + HealthList[ModelList.IndexOf(pedModel)]));
-                                        SET_CHAR_HEALTH(pedHandle, (uint)(pHealth + HealthList[ModelList.IndexOf(pedModel)]));
+                                        SET_CHAR_MAX_HEALTH(pedHandle, (uint)(HealthList[ModelList.IndexOf(pedModel)]));
+                                        SET_CHAR_HEALTH(pedHandle, (uint)(HealthList[ModelList.IndexOf(pedModel)]));
                                     }
 
                                     if (ArmorList.Count == ModelList.Count && ArmorList[ModelList.IndexOf(pedModel)])
@@ -176,6 +189,8 @@ namespace MissionStuff.ivsdk
 
                                     if (RagdollList.Count == ModelList.Count && RagdollList[ModelList.IndexOf(pedModel)])
                                         UNLOCK_RAGDOLL(pedHandle, false);
+
+                                    SpecialPedList.Add(pedHandle);
                                 }
                             }
                             else if (buffMissionPeds && !PedList.Contains(pedHandle))
@@ -209,6 +224,24 @@ namespace MissionStuff.ivsdk
                         {
                             if (pModel == GET_HASH_KEY(pedModel))
                             {
+                                if (!HAS_CHAR_BEEN_DAMAGED_BY_CHAR(ped, Main.PlayerHandle, false) && buffIfHurt)
+                                {
+                                    if (HealthList.Count == ModelList.Count && HealthList[ModelList.IndexOf(pedModel)] > 0)
+                                    {
+                                        SET_CHAR_MAX_HEALTH(ped, (uint)(HealthList[ModelList.IndexOf(pedModel)]));
+                                        SET_CHAR_HEALTH(ped, (uint)(HealthList[ModelList.IndexOf(pedModel)]));
+                                    }
+
+                                    if (ArmorList.Count == ModelList.Count && ArmorList[ModelList.IndexOf(pedModel)])
+                                    {
+                                        GET_CHAR_ARMOUR(ped, out uint pedArmor);
+                                        if (pedArmor < 100)
+                                            ADD_ARMOUR_TO_CHAR(ped, 100);
+                                    }
+
+                                    if (RagdollList.Count == ModelList.Count && RagdollList[ModelList.IndexOf(pedModel)])
+                                        UNLOCK_RAGDOLL(ped, false);
+                                }
                                 if (pedWeap != WeaponList[ModelList.IndexOf(pedModel)] && WeaponList[ModelList.IndexOf(pedModel)] > -1)
                                     GIVE_WEAPON_TO_CHAR(ped, WeaponList[ModelList.IndexOf(pedModel)], 9999, false);
                             }
@@ -248,17 +281,8 @@ namespace MissionStuff.ivsdk
                 }
                 else if (missionName == MissionSCO)
                 {
-                    ModelList.Clear();
-                    PedList.Clear();
-                    SpecialPedList.Clear();
-                    RagdollList.Clear();
-                    WeaponList.Clear();
-                    HealthList.Clear();
-                    ArmorList.Clear();
-                    OldWeaponList.Clear();
-                    NewWeaponList.Clear();
-                    WeapChanceList.Clear();
-                    PedWeapList.Clear();
+                    ClearLists();
+
                     giveBuffs = false;
                     missionName = "";
                 }
